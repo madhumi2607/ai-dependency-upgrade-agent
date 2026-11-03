@@ -9,16 +9,23 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
 
+# Every test run reinstalls the repo's dependencies in a fresh container, so downloads are
+# the slow, flaky part (a slow network once failed whole runs with PyPI read timeouts).
+# /pip-cache is a named volume shared across containers (see runner.py): each package is
+# downloaded once. Only downloaded files are shared, never installed state, so every run
+# still starts clean. Longer timeout + retries ride out short network glitches.
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
+    PIP_CACHE_DIR=/pip-cache \
+    PIP_DEFAULT_TIMEOUT=60 \
+    PIP_RETRIES=10 \
     PIP_ROOT_USER_ACTION=ignore \
     PYTHONDONTWRITEBYTECODE=1
 
 # Run as an unprivileged user, with packages going into a venv that user owns.
 RUN useradd --create-home sandbox \
     && python -m venv /venv \
-    && mkdir /work /out \
-    && chown -R sandbox /venv /work /out
+    && mkdir /work /out /pip-cache \
+    && chown -R sandbox /venv /work /out /pip-cache
 ENV PATH="/venv/bin:$PATH"
 
 COPY entrypoint.sh /usr/local/bin/run-tests

@@ -216,3 +216,10 @@ def test_budget_warning_is_appended_once_near_the_limit(repo: Path) -> None:
     # Append-only: every earlier conversation is a prefix of the next one.
     for earlier, later in zip(llm.seen, llm.seen[1:]):
         assert later[: len(earlier)] == earlier
+
+
+def test_baseline_install_failure_stops_before_calling_the_llm(repo: Path) -> None:
+    """The untouched repo not installing means PyPI or the network is down, not an agent problem."""
+    llm = ScriptedLLM()
+    result, _ = run(llm, repo, [{"status": "install_failed", "exit_code": 10, "log_tail": "ReadTimeoutError"}])
+    assert result.stop_reason == "sandbox_error" and llm.seen == []

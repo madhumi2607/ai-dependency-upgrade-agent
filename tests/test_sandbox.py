@@ -147,6 +147,7 @@ def test_build_docker_command(tmp_path: Path) -> None:
     assert f"{tmp_path.resolve()}:/src:ro" in cmd  # host repo is read-only
     assert "TEST_CMD=pytest tests 'tests/test_a.py::test_x[a b]'" in cmd  # quoted for the container shell
     assert 'TEST_DEPS=pytest "shapely<2.1"' in cmd
+    assert "migration-agent-pip-cache:/pip-cache" in cmd  # downloads shared across runs
     assert cmd[-1] == config.image
 
 

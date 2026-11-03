@@ -183,9 +183,10 @@ async def run_agent(
     if result.initial_report.get("status") == "passed":
         result.success, result.stop_reason, result.final_report = True, "already_passing", result.initial_report
         return result
-    if result.initial_report.get("status") in ("sandbox_error", "timeout"):
-        # The tests can't run at all (e.g. Docker is down). Don't pay for LLM calls the
-        # model can't verify: it would be editing code blind.
+    if result.initial_report.get("status") in ("sandbox_error", "timeout", "install_failed", "upgrade_failed"):
+        # The tests can't run at all: Docker is down, or the untouched repo won't even install
+        # (benchmark baselines are validated to install, so that means PyPI or the network is
+        # failing). Don't pay for LLM calls the model can't verify: it would be editing blind.
         result.stop_reason, result.final_report = "sandbox_error", result.initial_report
         result.error = str(result.initial_report.get("detail") or result.initial_report.get("status"))[:1000]
         return result

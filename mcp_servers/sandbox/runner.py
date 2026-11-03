@@ -36,6 +36,8 @@ class SandboxConfig:
     timeout_seconds: int = 600
     memory: str = "2g"
     cpus: str = "2"
+    # Named Docker volume holding pip's download cache, shared by every run ("" disables it).
+    pip_cache_volume: str = "migration-agent-pip-cache"
 
 
 def upgrade_packages(upgrade: str) -> list[str]:
@@ -60,6 +62,7 @@ def build_docker_command(config: SandboxConfig, out_dir: Path, container_name: s
         "--cpus", config.cpus,
         "-v", f"{config.repo_root.resolve()}:/src:ro",
         "-v", f"{out_dir.resolve()}:/out",
+        *(["-v", f"{config.pip_cache_volume}:/pip-cache"] if config.pip_cache_volume else []),
         "-e", f"INSTALL_CMD={config.install_cmd}",
         "-e", f"TEST_DEPS={config.test_deps}",
         "-e", f"UPGRADE={config.upgrade}",
