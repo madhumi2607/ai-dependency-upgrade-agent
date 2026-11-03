@@ -11,6 +11,7 @@ from typing import Any
 import pytest
 from mcp.server.mcpserver import MCPServer
 
+from agent import prompts
 from agent.llm import LLMResponse, Message, ToolCall, ToolSpec
 from agent.loop import LoopConfig, RunResult, TaskSpec, ToolBox, run_agent
 from mcp_servers.repo_tools.server import build_server as build_repo_tools
@@ -191,3 +192,27 @@ def test_broken_sandbox_stops_before_calling_the_llm(repo: Path) -> None:
     result, sandbox_calls = run(llm, repo, [broken])
     assert result.stop_reason == "sandbox_error" and "docker API" in result.error
     assert llm.seen == [] and len(sandbox_calls) == 1
+
+
+def test_full_suite_pass_gets_a_finish_hint_but_a_subset_does_not(repo: Path) -> None:
+    llm = ScriptedLLM(
+        call("run_tests", {"tests": ["tests/test_a.py"]}, call_id="sub"),
+        call("run_tests", {}, call_id="full"),
+        call("finish", {"summary": "ok"}),
+    )
+    # baseline fails; the model's two runs pass; verification passes
+    run(llm, repo, [FAILING, PASSING, PASSING, PASSING])
+    by_id = {m["tool_call_id"]: m["content"] for m in llm.seen[-1] if m["role"] == "tool"}
+    assert "call finish now" not in by_id["sub"]
+    assert by_id["full"].endswith(prompts.ALL_PASS_HINT)
+
+
+def test_budget_warning_is_appended_once_near_the_limit(repo: Path) -> None:
+    llm = ScriptedLLM()  # keeps calling list_files forever
+    result, _ = run(llm, repo, [FAILING], LoopConfig(max_steps=6))
+    assert result.stop_reason == "max_steps"
+    warnings = [m for m in llm.seen[-1] if m["role"] == "user" and "Budget notice" in m["content"]]
+    assert len(warnings) == 1 and "3 steps left" in warnings[0]["content"]
+    # Append-only: every earlier conversation is a prefix of the next one.
+    for earlier, later in zip(llm.seen, llm.seen[1:]):
+        assert later[: len(earlier)] == earlier

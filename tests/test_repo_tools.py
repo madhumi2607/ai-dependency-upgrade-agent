@@ -127,3 +127,19 @@ def test_server_over_mcp(repo: Path) -> None:
             assert "outside the target repo" in refused.content[0].text
 
     asyncio.run(scenario())
+
+
+def test_edit_file_not_found_shows_the_closest_match(repo: Path) -> None:
+    """A near miss (wrong indentation, as a model guessed in setup.py) gets the real text back."""
+    (repo / "pkg" / "setup_like.py").write_text(
+        'setup(\n    name="x",\n    python_requires=">=3.7",\n    classifiers=[\n        "Programming Language :: Python :: 3.7",\n    ],\n)\n',
+        encoding="utf-8")
+    with pytest.raises(RepoToolError) as excinfo:
+        tools.edit_file(repo, "pkg/setup_like.py", '            "Programming Language :: Python :: 3.7",', "x")
+    message = str(excinfo.value)
+    assert "closest match" in message
+    assert '    5          "Programming Language :: Python :: 3.7",' in message  # real indentation, numbered
+
+
+def test_closest_match_gives_up_on_unrelated_text() -> None:
+    assert tools.closest_match("a = 1\nb = 2\n", "completely different words here") is None

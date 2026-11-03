@@ -3,7 +3,9 @@
 import json
 from pathlib import Path
 
-from benchmark.runner import diff_size, failure_category, result_row
+import pytest
+
+from benchmark.runner import diff_size, failure_category, result_row, summarize_rows
 from benchmark.tasks import load_tasks
 
 
@@ -44,3 +46,16 @@ def test_result_row_from_a_recorded_run(tmp_path: Path) -> None:
     assert (row["files_changed"], row["lines_added"], row["lines_removed"]) == (2, 2, 1)
     assert row["cost_usd"] is not None and row["check_findings"] == ["[warning] pins: m"]
     assert diff_size(tmp_path / "missing") == {"files_changed": 0, "lines_added": 0, "lines_removed": 0}
+
+
+def test_summarize_rows_groups_by_setting() -> None:
+    rows = [
+        {"task": "t", "model": "m", "docs_search": False, "success": True, "steps": 10, "cost_usd": 0.01},
+        {"task": "t", "model": "m", "docs_search": False, "success": False, "steps": 40, "cost_usd": 0.05},
+        {"task": "t", "model": "m", "docs_search": False, "success": True, "steps": 12, "cost_usd": 0.03},
+        {"task": "t", "model": "m", "docs_search": True, "success": True, "steps": 9, "cost_usd": 0.02},
+    ]
+    off, on = summarize_rows(rows)
+    assert (off["runs"], off["succeeded"], off["median_steps"]) == (3, 2, 12)
+    assert off["mean_cost_usd"] == pytest.approx(0.03)
+    assert (on["runs"], on["succeeded"]) == (1, 1)

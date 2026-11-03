@@ -19,13 +19,29 @@ Rules:
 - Do a real migration to the {library} {new_version} API. Do not route around it with \
 compatibility shims that keep the old API alive (for Pydantic: no `pydantic.v1` imports).
 - Update the dependency pin in the project metadata (pyproject.toml, setup.py/setup.cfg or \
-requirements files) so it allows {library} {new_version}.
+requirements files) so it allows {library} {new_version} and excludes versions the migrated code \
+no longer supports. Also check the pins of companion packages that must move with it (for example \
+web frameworks or plugins built on {library}): their minimum must support {library} {new_version}.
 - Work one root cause at a time, starting with the largest failure group. Read the code at the \
 reported location before editing it. Prefer small, targeted edits.
 - After related edits, re-run the affected tests to check them before moving on.
 """
 
 NUDGE = "Continue by calling a tool. If every test passes, call finish with a summary of your changes."
+
+# Appended to a full-suite run_tests result that passed: a model that keeps polishing after the
+# tests pass can run out of steps before calling finish (seen with Haiku 5.5 on pydantic-cli).
+ALL_PASS_HINT = (
+    "All tests pass. If the migration is complete, call finish now with a summary; "
+    "optional tidy-ups (docs, comments) can be listed in the summary for review instead."
+)
+
+
+def budget_warning(steps_left: int) -> str:
+    return (
+        f"Budget notice: you have {steps_left} steps left before this run stops. "
+        "If the tests pass, call finish now; otherwise make the most important fix and run the tests."
+    )
 
 
 DOCS_LINE = (

@@ -130,6 +130,30 @@ def read_file(root: Path, path: str, start_line: int = 1, end_line: int | None =
     }
 
 
+def closest_match(content: str, old_text: str, min_ratio: float = 0.6) -> str | None:
+    """The block of lines in `content` most similar to `old_text`, numbered, or None.
+
+    Most failed edits are near misses (wrong indentation, a changed quote), and an agent
+    that only hears "not found" guesses again. Showing the real text lets it copy it.
+    Compares every window of the same line count, so it's O(lines) comparisons: fine for
+    source files.
+    """
+    lines = content.split("\n")
+    want = old_text.strip("\n").split("\n")
+    size = len(want)
+    if not want or size > len(lines):
+        return None
+    target = "\n".join(want)
+    best_ratio, best_start = 0.0, 0
+    for start in range(len(lines) - size + 1):
+        ratio = difflib.SequenceMatcher(None, "\n".join(lines[start:start + size]), target, autojunk=False).ratio()
+        if ratio > best_ratio:
+            best_ratio, best_start = ratio, start
+    if best_ratio < min_ratio:
+        return None
+    return "\n".join(f"{n:>5}  {lines[n - 1]}" for n in range(best_start + 1, best_start + size + 1))
+
+
 def edit_file(root: Path, path: str, old_text: str, new_text: str) -> dict[str, Any]:
     """Replace exactly one occurrence of `old_text` with `new_text`.
 
@@ -157,7 +181,12 @@ def edit_file(root: Path, path: str, old_text: str, new_text: str) -> dict[str, 
 
     count = content.count(old_text)
     if count == 0:
-        raise RepoToolError("old_text was not found. Re-read the file and copy the text exactly, including indentation.")
+        hint = closest_match(content, old_text)
+        raise RepoToolError(
+            "old_text was not found. "
+            + (f"The closest match in the file is below; copy it exactly (without the line numbers):\n{hint}"
+               if hint else "Re-read the file and copy the text exactly, including indentation.")
+        )
     if count > 1:
         raise RepoToolError(f"old_text appears {count} times. Include more surrounding lines so it is unique.")
 

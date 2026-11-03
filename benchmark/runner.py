@@ -97,30 +97,34 @@ def main() -> None:
     parser.add_argument("--docs", choices=["on", "off", "both"], default="on")
     parser.add_argument("--tasks", default="all", help="comma-separated task ids, or 'all'")
     parser.add_argument("--max-steps", type=int, default=40)
+    parser.add_argument("--repeats", type=int, default=1, help="runs per setting (one run per setting is anecdote, not data)")
     args = parser.parse_args()
 
     all_tasks = load_tasks()
     tasks = list(all_tasks.values()) if args.tasks == "all" else [all_tasks[t] for t in args.tasks.split(",")]
     models = args.models.split(",")
     docs_settings = {"on": [True], "off": [False], "both": [False, True]}[args.docs]
-    plan = [(t, m, d) for t in tasks for m in models for d in docs_settings]
+    # Repeats are the outer loop, so each setting's runs are spread over the experiment's time
+    # (API latency and load drift over an hour; back-to-back repeats would share that drift).
+    plan = [(r, t, m, d) for r in range(1, args.repeats + 1) for t in tasks for m in models for d in docs_settings]
 
     started = datetime.now(timezone.utc)
     out = RESULTS_DIR / f"{args.name}-{started:%Y%m%d-%H%M%S}.json"
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     experiment: dict[str, Any] = {
         "name": args.name, "started_at": started.isoformat(),
-        "config": {"models": models, "docs": args.docs, "tasks": [t.id for t in tasks], "max_steps": args.max_steps},
+        "config": {"models": models, "docs": args.docs, "tasks": [t.id for t in tasks], "max_steps": args.max_steps,
+                   "repeats": args.repeats},
         "rows": [],
     }
-    for i, (task, model, docs) in enumerate(plan, 1):
-        print(f"[{i}/{len(plan)}] {task.id} · {model} · docs {'on' if docs else 'off'}", flush=True)
+    for i, (repeat, task, model, docs) in enumerate(plan, 1):
+        print(f"[{i}/{len(plan)}] {task.id} · {model} · docs {'on' if docs else 'off'} · repeat {repeat}", flush=True)
         run_dir = run_one(task, model, docs, args.max_steps)
         if run_dir is None:
-            experiment["rows"].append({"task": task.id, "model": model, "docs_search": docs, "success": False,
-                                       "failure_category": "infrastructure", "run_id": None})
+            experiment["rows"].append({"task": task.id, "model": model, "docs_search": docs, "repeat": repeat,
+                                       "success": False, "failure_category": "infrastructure", "run_id": None})
         else:
-            row = result_row(task, model, docs, run_dir)
+            row = {**result_row(task, model, docs, run_dir), "repeat": repeat}
             experiment["rows"].append(row)
             cost = f"${row['cost_usd']:.2f}" if row["cost_usd"] is not None else "?"
             print(f"  -> {'OK' if row['success'] else 'FAIL'} · {row['steps']} steps · {cost} · {row['run_id']}", flush=True)
@@ -130,7 +134,28 @@ def main() -> None:
 
     rows = experiment["rows"]
     total = sum(r.get("cost_usd") or 0 for r in rows)
-    print(f"\n{sum(r['success'] for r in rows)}/{len(rows)} succeeded · est. ${total:.2f} · {out}")
+    print(f"\n{sum(r['success'] for r in rows)}/{len(rows)} succeeded · est. ${total:.2f} · {out}\n")
+    for g in summarize_rows(rows):
+        print(f"  {g['task']:18} {g['model']:18} docs {'on ' if g['docs_search'] else 'off'}  "
+              f"{g['succeeded']}/{g['runs']} ok · median {g['median_steps']} steps · mean ${g['mean_cost_usd']:.3f}")
+
+
+def summarize_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """One line per (task, model, docs) setting: success count, median steps, mean cost."""
+    groups: dict[tuple, list[dict[str, Any]]] = {}
+    for r in rows:
+        groups.setdefault((r["task"], r["model"], r["docs_search"]), []).append(r)
+    summary = []
+    for (task, model, docs), runs in groups.items():
+        steps = sorted(r.get("steps") or 0 for r in runs)
+        costs = [r.get("cost_usd") or 0.0 for r in runs]
+        summary.append({
+            "task": task, "model": model, "docs_search": docs, "runs": len(runs),
+            "succeeded": sum(bool(r.get("success")) for r in runs),
+            "median_steps": steps[len(steps) // 2] if len(steps) % 2 else (steps[len(steps) // 2 - 1] + steps[len(steps) // 2]) / 2,
+            "mean_cost_usd": sum(costs) / len(costs),
+        })
+    return summary
 
 
 if __name__ == "__main__":

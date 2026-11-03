@@ -31,6 +31,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # Receives one dict per thing that happens in a run (see run_agent); used for tracing.
 EventHandler = Callable[[dict[str, Any]], None]
 
+BUDGET_WARNING_STEPS = 3  # warn the model when this many steps are left
+
 FINISH_TOOL = ToolSpec(
     name="finish",
     description="Call when the migration is complete and all tests pass. Triggers a full verification run.",
@@ -229,7 +231,15 @@ async def run_agent(
                     return result
                 tool_result(call, prompts.verification_failed(report), started)
             else:
-                tool_result(call, await _run_tool_call(toolbox, call, config.max_tool_result_chars), started)
+                content = await _run_tool_call(toolbox, call, config.max_tool_result_chars)
+                if call.name == "run_tests" and not call.arguments.get("tests") and _passed(content):
+                    content = f"{content}\n\n{prompts.ALL_PASS_HINT}"
+                tool_result(call, content, started)
+
+        # Warn once, with a few steps left, so the model can wrap up instead of being cut off.
+        # Appended as a new message (never edited into earlier turns): keeps the history append-only.
+        if config.max_steps - result.steps == BUDGET_WARNING_STEPS:
+            user_message(prompts.budget_warning(BUDGET_WARNING_STEPS))
 
     # Budget exhausted or LLM failed: one last full run so the metrics reflect where the repo ended up.
     result.final_report = await test_run("final")
@@ -243,6 +253,14 @@ def _emit_llm_call(emit: Callable[..., None], step: int, response: LLMResponse, 
          tool_calls=[{"id": c.id, "name": c.name, "arguments": c.arguments, "error": c.error} for c in response.tool_calls],
          # Provider-native turn (e.g. signed thinking blocks): needed to replay the exact history.
          provider_state=response.provider_state)
+
+
+def _passed(content: str) -> bool:
+    """True if a rendered run_tests result says the suite passed."""
+    try:
+        return json.loads(content).get("status") == "passed"
+    except (json.JSONDecodeError, AttributeError):
+        return False
 
 
 async def _run_tool_call(toolbox: ToolBox, call: ToolCall, limit: int) -> str:
