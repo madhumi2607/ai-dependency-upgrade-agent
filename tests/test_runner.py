@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from benchmark.runner import diff_size, failure_category, result_row, summarize_rows
+from benchmark.runner import diff_size, failure_category, is_complete, result_row, summarize_rows
 from benchmark.tasks import load_tasks
 
 
@@ -50,12 +50,27 @@ def test_result_row_from_a_recorded_run(tmp_path: Path) -> None:
 
 def test_summarize_rows_groups_by_setting() -> None:
     rows = [
-        {"task": "t", "model": "m", "docs_search": False, "success": True, "steps": 10, "cost_usd": 0.01},
-        {"task": "t", "model": "m", "docs_search": False, "success": False, "steps": 40, "cost_usd": 0.05},
-        {"task": "t", "model": "m", "docs_search": False, "success": True, "steps": 12, "cost_usd": 0.03},
-        {"task": "t", "model": "m", "docs_search": True, "success": True, "steps": 9, "cost_usd": 0.02},
+        {"task": "t", "model": "m", "docs_search": False, "run_id": "a", "success": True, "steps": 10, "cost_usd": 0.01},
+        {"task": "t", "model": "m", "docs_search": False, "run_id": "b", "success": False, "steps": 40, "cost_usd": 0.05},
+        {"task": "t", "model": "m", "docs_search": False, "run_id": "c", "success": True, "steps": 12, "cost_usd": 0.03},
+        {"task": "t", "model": "m", "docs_search": True, "run_id": "d", "success": True, "steps": 9, "cost_usd": 0.02},
     ]
     off, on = summarize_rows(rows)
     assert (off["runs"], off["succeeded"], off["median_steps"]) == (3, 2, 12)
     assert off["mean_cost_usd"] == pytest.approx(0.03)
     assert (on["runs"], on["succeeded"]) == (1, 1)
+
+
+def test_unfinished_run_is_infrastructure() -> None:
+    assert failure_category(summary(status="running", stop_reason=None)) == "infrastructure"
+
+
+def test_infrastructure_rows_are_rerun_on_resume_and_left_out_of_summaries() -> None:
+    ok = {"task": "t", "model": "m", "docs_search": True, "run_id": "r1", "failure_category": None, "success": True, "steps": 9}
+    never_started = {"task": "t", "model": "m", "docs_search": True, "run_id": None, "failure_category": "infrastructure"}
+    baseline_broke = {"task": "t", "model": "m", "docs_search": True, "run_id": "r2", "failure_category": "infrastructure"}
+    budget = {"task": "t", "model": "m", "docs_search": True, "run_id": "r3", "failure_category": "budget_exhausted",
+              "success": False, "steps": 40}
+    assert [is_complete(r) for r in (ok, never_started, baseline_broke, budget)] == [True, False, False, True]
+    [group] = summarize_rows([ok, never_started, baseline_broke, budget])
+    assert (group["runs"], group["succeeded"]) == (2, 1)  # an agent failure counts; infrastructure doesn't
