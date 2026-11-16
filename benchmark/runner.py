@@ -140,6 +140,13 @@ def main() -> None:
     plan = [(r, t, m, d) for r in range(1, config["repeats"] + 1) for t in tasks for m in config["models"] for d in docs_settings]
 
     key = lambda r: (r.get("repeat", 1), r["task"], r["model"], r["docs_search"])  # noqa: E731
+    if args.resume:
+        # Re-check old rows against today's rules: a row written by an older runner version can
+        # carry an outdated category (e.g. a killed run labelled needs_review instead of infrastructure).
+        for r in experiment["rows"]:
+            run_dir = RUNS_DIR / r["run_id"] if r.get("run_id") else None
+            if run_dir is not None and run_dir.is_dir() and r["task"] in all_tasks:
+                r.update(result_row(all_tasks[r["task"]], r["model"], r["docs_search"], run_dir))
     done = {key(r): r for r in experiment["rows"] if is_complete(r)}
     if args.resume:
         print(f"Resuming {out.name}: keeping {len(done)} results, running {len(plan) - len(done)}.")
