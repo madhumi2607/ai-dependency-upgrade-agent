@@ -65,6 +65,23 @@ tasks:
     # no drop-in reference for them: the agent must keep v1 CLI behaviour on top of v2 introspection.
     reference_solution: https://github.com/mpkocher/pydantic-cli/pull/58
 
+  - id: pyonwater
+    difficulty: easy
+    repo: https://github.com/kdeyev/pyonwater
+    commit: 5f6301fb6cc9bf2c615a7f7bd9e16d1d75bc4e4b  # pins pydantic <2
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    # No import errors: under v2 the code loads, but Optional fields without defaults become required,
+    # so the API sample data stops validating (behaviour change, not a crash).
+    install: pip install -e .
+    # The tests use the `loop` fixture, which pytest-aiohttp 1.0 removed; pytest-asyncio clashes with it.
+    test_deps: '"pytest>=7,<8" "pytest-aiohttp<1"'
+    upgrade: pydantic>=2,<3
+    test: pytest tests
+    baseline: 25 passed on pydantic 1.10 (v2 unchanged - 10 passed, 15 ValidationError)
+    reference_solution: https://github.com/kdeyev/pyonwater/pull/26
+
 # Rejected tasks, kept so they aren't re-evaluated.
 rejected:
   - id: pydantic-argparse
