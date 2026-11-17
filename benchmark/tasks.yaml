@@ -82,6 +82,78 @@ tasks:
     baseline: 25 passed on pydantic 1.10 (v2 unchanged - 10 passed, 15 ValidationError)
     reference_solution: https://github.com/kdeyev/pyonwater/pull/26
 
+  - id: pydantic-sqlite
+    difficulty: medium
+    repo: https://github.com/Phil997/pydantic-sqlite
+    commit: cb66bf28b47f4b50461a0c76c4fcb7bb2da2e86a  # 0.2.2, pins pydantic ^1.8.2
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    # Library introspects v1 fields (ModelField, __fields__, .type_) to map models onto SQLite.
+    install: pip install -e .
+    test_deps: '"pytest>=7,<8" hypothesis testfixtures'
+    upgrade: pydantic>=2,<3
+    test: pytest tests
+    baseline: 30 passed on pydantic 1.10 (v2 unchanged - every test module fails to import ModelField)
+    # Upstream also changed a test model's Union order; a hypothesis test may need care under v2's smart unions.
+    reference_solution: https://github.com/Phil997/pydantic-sqlite/pull/16
+
+  - id: dbt-cloud-cli
+    difficulty: medium
+    repo: https://github.com/data-mie/dbt-cloud-cli
+    commit: cb2680d353727f895b958fd8c5a8fec7657962b6  # 0.8.2+1, pins pydantic==1.10.10
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    # Builds click options from v1 field internals (__fields__, .type_, .outer_type_, field_info.extra).
+    install: pip install -e ".[test]"
+    test_deps: '"pytest>=7,<8" requests-mock'
+    upgrade: pydantic>=2,<3
+    # DBT_CLOUD_ACCOUNT_ID: set by the repo's tox.ini; test_cli.py calls the real dbt Cloud API.
+    test: DBT_CLOUD_ACCOUNT_ID=123456 pytest tests --ignore=tests/test_cli.py
+    baseline: 31 passed on pydantic 1.10 (v2 unchanged - startup error, v1 validator signature)
+    reference_solution: https://github.com/data-mie/dbt-cloud-cli/pull/108
+
+  - id: gto
+    difficulty: hard
+    repo: https://github.com/iterative/gto
+    commit: 5f141e4b649788cec87c76bca38893b2afd47030  # setup.py pins pydantic>=1.9.0,<2
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    # BaseSettings with custom settings sources (pydantic.env_settings), parse_obj_as, Optional fields.
+    install: pip install -e ".[tests]"
+    # Era pins for the git stack the tests drive: newer typer drops click, click 8.2 changed CliRunner,
+    # dulwich 0.22 removed Repo.stage, pygit2 1.15 removed GIT_OBJ_COMMIT. pytest<8 for pytest-lazy-fixture.
+    test_deps: '"pytest>=7,<8" "typer<0.10" "click<8.2" "dulwich<0.22" "pygit2<1.15"'
+    upgrade: pydantic>=2,<3
+    test: pytest tests -k "not remote"  # "remote" tests clone from github.com
+    baseline: 141 passed on pydantic 1.10 (v2 unchanged - startup error, BaseSettings moved)
+    # Upstream's native port (PR #485) renamed config attributes TYPES -> types in tests; the agent must
+    # keep the original names, so there's no drop-in reference for that part.
+    reference_solution: https://github.com/iterative/gto/pull/485
+
+  - id: copier
+    difficulty: hard
+    repo: https://github.com/copier-org/copier
+    commit: 3a76e6645ab5d3a1c36684f8ceefd77c4fd4c6a5  # v8.1.0+4, pins pydantic >=1.10.2,<2
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    # Imports pydantic v1 internals (errors._PathValueError, validators, typing, json) and uses
+    # pydantic dataclasses throughout.
+    install: pip install -e .
+    # pyyaml-include 2 renamed its module; pathspec 0.12 deprecation warnings are errors in this suite.
+    test_deps: '"pytest>=7,<8" pytest-cov pytest-xdist pexpect plumbum poethepoet "pyyaml-include<2" "pathspec<0.12"'
+    upgrade: pydantic>=2,<3
+    # -n 2: the suite's own config runs one xdist worker per host CPU, which ran out of memory (2 GB).
+    # test_types runs mypy (a lint step, not behaviour); "impure" tests use the network.
+    test: pytest -m "not impure" -n 2 tests --deselect tests/test_tools.py::test_types
+    baseline: 691 passed, 5 skipped on pydantic 1.10 (v2 unchanged - startup error, _PathValueError removed)
+    # Upstream PR #1229 changed 2 tests (a TypeError -> ValidationError, an int -> "2" in a fixture), so those
+    # two may need library-side compatibility work to pass unchanged.
+    reference_solution: https://github.com/copier-org/copier/pull/1229
+
 # Rejected tasks, kept so they aren't re-evaluated.
 rejected:
   - id: pydantic-argparse

@@ -216,3 +216,14 @@ def test_docker_engine_down_is_sandbox_error_despite_exit_code_1(tmp_path: Path,
     result = runner.run_tests(SandboxConfig(repo_root=tmp_path, install_cmd="x", test_cmd="pytest"))
     assert result["status"] == "sandbox_error" and result["exit_code"] == 1
     assert "docker API" in result["detail"]
+
+
+def test_startup_error_from_a_plain_python_traceback() -> None:
+    """pytest crashing while importing a plugin dependency prints an ordinary traceback,
+    not pytest's format (real log from connect-eaas-core). The summary must not be empty."""
+    log = (FIXTURES / "pytest_plugin_import_error.log").read_text(encoding="utf-8")
+    group = report.parse_startup_error(log)
+    assert group["error_type"] == "ModuleNotFoundError"
+    assert group["message"] == "No module named 'pytest_httpx._options'"
+    # Deepest frame inside the repo, not the one in site-packages.
+    assert group["location"] == "connect/eaas/core/testing/testclient.py:16"

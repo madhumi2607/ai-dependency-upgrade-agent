@@ -143,13 +143,41 @@ def group_failures(failures: list[dict[str, Any]]) -> tuple[list[dict[str, Any]]
     return ordered[:MAX_GROUPS], max(len(ordered) - MAX_GROUPS, 0)
 
 
+PY_FRAME_RE = re.compile(r'^\s*File "(?P<path>[^"]+)", line (?P<line>\d+)')
+PY_EXC_RE = re.compile(r"^(?P<type>[A-Za-z_][\w.]*(?:Error|Exception|Exit|Warning|Interrupt)): ?(?P<msg>.*)$")
+
+
+def parse_python_traceback(text: str) -> dict[str, str | None]:
+    """Error type, message and deepest in-repo file:line from a plain Python traceback.
+
+    pytest prints its own format for test failures, but when it crashes while loading a
+    plugin or conftest dependency it dumps an ordinary traceback ('File "...", line N'
+    frames and a final 'SomeError: message' line). Without this the summary was empty.
+    """
+    location = None
+    for line in text.splitlines():
+        if match := PY_FRAME_RE.match(line):
+            rel = _repo_relative(match["path"])
+            if rel is not None:
+                location = f"{rel}:{match['line']}"
+    error_type = message = None
+    for line in reversed(text.splitlines()):
+        if match := PY_EXC_RE.match(line.strip()):
+            error_type, message = match["type"], match["msg"]
+            break
+    return {"error_type": error_type, "message": (message or "")[:MAX_MESSAGE_CHARS], "location": location}
+
+
 def parse_startup_error(log: str) -> dict[str, Any]:
     """Summarise a run where pytest crashed before writing junit.xml."""
     conftest = re.search(r"while loading conftest '(?:/work/)?([^']+)'", log)
     tail = "\n".join(log.splitlines()[-60:])  # the relevant traceback is at the end
+    details = parse_traceback(tail)
+    if not details["error_type"] and not details["message"]:
+        details = parse_python_traceback(tail)
     return {
         "kind": "startup_error",
-        **parse_traceback(tail),
+        **details,
         "count": 1,
         "example_tests": [conftest[1]] if conftest else [],
     }

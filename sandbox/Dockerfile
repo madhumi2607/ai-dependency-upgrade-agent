@@ -34,5 +34,11 @@ COPY entrypoint.sh /usr/local/bin/run-tests
 RUN sed -i 's/\r$//' /usr/local/bin/run-tests && chmod +x /usr/local/bin/run-tests
 
 USER sandbox
+# Many test suites create git repos and commit (gto, copier). CI machines always have an
+# identity configured; without one every such test fails with "user name and email".
+RUN git config --global user.name "Sandbox" \
+    && git config --global user.email "sandbox@example.invalid" \
+    && git config --global init.defaultBranch main \
+    && git config --global --add safe.directory '*'
 WORKDIR /work
 ENTRYPOINT ["run-tests"]

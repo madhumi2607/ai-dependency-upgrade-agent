@@ -52,3 +52,26 @@ def test_prepare_checkout_refuses_leftover_edits(local_task: Task) -> None:
     (local_task.checkout / "lib.py").write_text("x = 2\n", encoding="utf-8")
     with pytest.raises(SystemExit, match="uncommitted changes"):
         prepare_checkout(local_task)
+
+
+def test_checkout_keeps_the_repos_own_line_endings(local_task: Task) -> None:
+    """With Windows' core.autocrlf=true, files came out with CRLF and scripts broke in Linux."""
+    origin = Path(local_task.repo)
+    (origin / "run.py").write_bytes(b"#!/usr/bin/env python\nprint('hi')\n")
+    git = ["git", "-c", "user.email=t@t", "-c", "user.name=t", "-C", str(origin)]
+    subprocess.run([*git, "add", "-A"], check=True)
+    subprocess.run([*git, "commit", "-qm", "script"], check=True)
+    local_task.commit = subprocess.run(["git", "-C", str(origin), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+
+    prepare_checkout(local_task)
+    assert (local_task.checkout / "run.py").read_bytes() == b"#!/usr/bin/env python\nprint('hi')\n"
+
+
+def test_old_crlf_clone_is_converted(local_task: Task) -> None:
+    """A clone made the old way (inheriting Windows' autocrlf=true) is converted in place."""
+    local_task.checkout.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "clone", "-q", "-c", "core.autocrlf=true", local_task.repo, str(local_task.checkout)], check=True)
+    assert (local_task.checkout / "lib.py").read_bytes() == b"x = 1\r\n"  # what the old clones looked like
+
+    prepare_checkout(local_task)
+    assert (local_task.checkout / "lib.py").read_bytes() == b"x = 1\n"
