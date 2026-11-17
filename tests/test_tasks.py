@@ -75,3 +75,9 @@ def test_old_crlf_clone_is_converted(local_task: Task) -> None:
 
     prepare_checkout(local_task)
     assert (local_task.checkout / "lib.py").read_bytes() == b"x = 1\n"
+
+
+def test_task_timeout_reaches_the_sandbox() -> None:
+    tasks = load_tasks()
+    assert tasks["copier"].sandbox_env()["SANDBOX_TIMEOUT_SECONDS"] == "1500"  # slow suite
+    assert tasks["geojson-pydantic"].sandbox_env()["SANDBOX_TIMEOUT_SECONDS"] == "600"  # default

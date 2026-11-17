@@ -149,6 +149,8 @@ tasks:
     # -n 2: the suite's own config runs one xdist worker per host CPU, which ran out of memory (2 GB).
     # test_types runs mypy (a lint step, not behaviour); "impure" tests use the network.
     test: pytest -m "not impure" -n 2 tests --deselect tests/test_tools.py::test_types
+    # The suite alone takes ~8 minutes; with installs on a slow network one run exceeded the default.
+    timeout_seconds: 1500
     baseline: 691 passed, 5 skipped on pydantic 1.10 (v2 unchanged - startup error, _PathValueError removed)
     # Upstream PR #1229 changed 2 tests (a TypeError -> ValidationError, an int -> "2" in a fixture), so those
     # two may need library-side compatibility work to pass unchanged.

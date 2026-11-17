@@ -87,9 +87,12 @@ class ToolBox:
         self.specs: list[ToolSpec] = []
 
     async def __aenter__(self) -> "ToolBox":
+        # How long to wait for any tool: longer than the sandbox's own limit, so a slow test run
+        # ends as a clean "timeout" report from the sandbox, never as an MCP error that kills the
+        # run (a fixed 900s was shorter than copier's install + suite on a slow network).
+        read_timeout = int(os.environ.get("SANDBOX_TIMEOUT_SECONDS", "600")) + 300
         for server in self._servers:
-            # Generous read timeout: a run_tests call installs deps and runs the suite.
-            client = await self._stack.enter_async_context(Client(server, read_timeout_seconds=900))
+            client = await self._stack.enter_async_context(Client(server, read_timeout_seconds=read_timeout))
             for tool in (await client.list_tools()).tools:
                 if tool.name in self._routes:
                     raise ValueError(f"Two MCP servers both define a tool named {tool.name!r}.")

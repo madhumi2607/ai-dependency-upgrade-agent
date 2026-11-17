@@ -23,6 +23,7 @@ class Task:
     test: str
     test_deps: str = ""
     difficulty: str = ""
+    timeout_seconds: str = "600"  # sandbox limit for one install + test run; raise for slow suites
 
     @property
     def checkout(self) -> Path:
@@ -36,6 +37,7 @@ class Task:
             "SANDBOX_TEST_DEPS": self.test_deps,
             "SANDBOX_TEST_CMD": self.test,
             "SANDBOX_UPGRADE": self.upgrade,
+            "SANDBOX_TIMEOUT_SECONDS": self.timeout_seconds,
         }
 
 
