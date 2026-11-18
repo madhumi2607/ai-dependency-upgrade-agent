@@ -2,7 +2,7 @@
 name = "migration-agent"
 version = "0.1.0"
 description = "An autonomous agent that upgrades Python codebases across breaking library releases."
-readme = "CLAUDE.md"
+readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     # Anthropic's official SDK: the Claude provider (default model for agent runs).
