@@ -143,3 +143,12 @@ def test_edit_file_not_found_shows_the_closest_match(repo: Path) -> None:
 
 def test_closest_match_gives_up_on_unrelated_text() -> None:
     assert tools.closest_match("a = 1\nb = 2\n", "completely different words here") is None
+
+
+@pytest.mark.parametrize("glob", ["/venv/lib/python3.11/site-packages/pydantic/dataclasses.py", "../**/*.py", "C:/x/*.py"])
+def test_globs_outside_the_repo_get_a_clear_refusal(repo: Path, glob: str) -> None:
+    """Absolute globs used to crash Path.glob, and the model only saw 'Error executing tool'."""
+    with pytest.raises(RepoToolError, match="relative to the repo root"):
+        tools.search_code(repo, "x", glob)
+    with pytest.raises(RepoToolError, match="relative to the repo root"):
+        tools.list_files(repo, glob)

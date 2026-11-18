@@ -58,6 +58,11 @@ def is_test_file(rel_path: Path) -> bool:
 
 def _iter_files(root: Path, glob: str) -> list[Path]:
     """Files under `root` matching `glob`, skipping ignored dirs, sorted for stable output."""
+    # Path.glob raises a bare NotImplementedError for absolute patterns, which MCP turns into a
+    # meaningless "Error executing tool" (a model once globbed /venv/.../pydantic/dataclasses.py).
+    if glob.startswith(("/", "\\")) or re.match(r"^[A-Za-z]:", glob) or ".." in Path(glob).parts:
+        raise RepoToolError(f"glob {glob!r} must be relative to the repo root (e.g. '**/*.py'); "
+                            "files outside the target repo can't be searched.")
     root = root.resolve()
     files = []
     for path in root.glob(glob):
