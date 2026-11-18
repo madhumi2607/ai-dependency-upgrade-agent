@@ -15,6 +15,9 @@ dependencies = [
     "google-genai>=2.31,<3",
     # Groq's official SDK: the first LLM provider; its built-in retry/backoff handles 429s.
     "groq>=1.7,<2",
+    # Graph-based orchestration for the second agent loop (agent_langgraph/), compared against the
+    # hand-written one. Only StateGraph is used: the LLM client and MCP tools stay our own.
+    "langgraph>=1.2.22,<2",
     # Official MCP Python SDK: used to build the repo_tools and sandbox tool servers.
     "mcp>=2.3,<3",
     # Version-range parsing for the review checks (agent/checks.py); the same library pip uses.

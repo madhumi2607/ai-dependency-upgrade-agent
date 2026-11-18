@@ -77,11 +77,15 @@ def result_row(task: Task, model: str, docs: bool, run_dir: Path) -> dict[str, A
     }
 
 
-def run_one(task: Task, model: str, docs: bool, max_steps: int) -> tuple[Path | None, str | None]:
+# Agent implementations an experiment can run: the hand-written loop or the LangGraph graph.
+IMPLS = {"loop": "agent.loop", "langgraph": "agent_langgraph.run"}
+
+
+def run_one(task: Task, model: str, docs: bool, max_steps: int, impl: str = "loop") -> tuple[Path | None, str | None]:
     """One agent run in a subprocess. Returns (its runs/<id> directory or None if it never
     started, the error text if it never started or didn't finish)."""
     reset_checkout(task)
-    cmd = [sys.executable, "-m", "agent.loop", "--task", task.id, "--max-steps", str(max_steps)]
+    cmd = [sys.executable, "-m", IMPLS[impl], "--task", task.id, "--max-steps", str(max_steps)]
     if not docs:
         cmd.append("--no-docs")
     env = {**os.environ, "LLM_PROVIDER": "claude", "AGENT_CLAUDE_MODEL": model}
@@ -116,6 +120,7 @@ def main() -> None:
     parser.add_argument("--docs", choices=["on", "off", "both"], default="on")
     parser.add_argument("--tasks", default="all", help="comma-separated task ids, or 'all'")
     parser.add_argument("--max-steps", type=int, default=40)
+    parser.add_argument("--impl", choices=list(IMPLS), default="loop", help="agent implementation to run")
     parser.add_argument("--repeats", type=int, default=1, help="runs per setting (one run per setting is anecdote, not data)")
     parser.add_argument("--resume", help="an earlier results file: keep its real results, rerun only missing "
                                          "or infrastructure-failed runs (its settings are used; other flags ignored)")
@@ -131,7 +136,7 @@ def main() -> None:
         out = RESULTS_DIR / f"{args.name}-{started:%Y%m%d-%H%M%S}.json"
         config = {"models": args.models.split(","), "docs": args.docs,
                   "tasks": list(all_tasks) if args.tasks == "all" else args.tasks.split(","),
-                  "max_steps": args.max_steps, "repeats": args.repeats}
+                  "max_steps": args.max_steps, "repeats": args.repeats, "impl": args.impl}
         experiment = {"name": args.name, "started_at": started.isoformat(), "config": config, "rows": []}
     tasks = [all_tasks[t] for t in config["tasks"]]
     docs_settings = {"on": [True], "off": [False], "both": [False, True]}[config["docs"]]
@@ -161,12 +166,13 @@ def main() -> None:
             print(f"Stopping: Docker isn't available ({problem}). Start Docker Desktop, then resume with:\n"
                   f"  uv run --env-file .env python -m benchmark.runner --name x --resume {out}")
             break
-        run_dir, error = run_one(task, model, docs, config["max_steps"])
+        impl = config.get("impl", "loop")  # older results files predate --impl
+        run_dir, error = run_one(task, model, docs, config["max_steps"], impl)
         if run_dir is None:
             rows[k] = {"task": task.id, "model": model, "docs_search": docs, "repeat": repeat, "success": False,
                        "failure_category": "infrastructure", "run_id": None, "error": error}
         else:
-            row = {**result_row(task, model, docs, run_dir), "repeat": repeat}
+            row = {**result_row(task, model, docs, run_dir), "repeat": repeat, "impl": impl}
             if error:
                 row["error"] = error
             rows[k] = row

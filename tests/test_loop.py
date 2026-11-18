@@ -13,7 +13,9 @@ from mcp.server.mcpserver import MCPServer
 
 from agent import prompts
 from agent.llm import LLMResponse, Message, ToolCall, ToolSpec
-from agent.loop import LoopConfig, RunResult, TaskSpec, ToolBox, run_agent
+from agent import loop
+from agent.loop import LoopConfig, RunResult, TaskSpec, ToolBox
+from agent_langgraph import graph
 from mcp_servers.repo_tools.server import build_server as build_repo_tools
 
 TASK = TaskSpec("pydantic", "1", "2")
@@ -56,6 +58,17 @@ def fake_sandbox(reports: list[dict[str, Any]]) -> tuple[MCPServer, list[int]]:
     return server, calls
 
 
+# Every test runs against both implementations: the hand-written loop and the LangGraph graph
+# must behave identically (same tool results, same budgets, same stop reasons).
+IMPL = {"run_agent": loop.run_agent}
+
+
+@pytest.fixture(params=["loop", "langgraph"], autouse=True)
+def impl(request: pytest.FixtureRequest) -> str:
+    IMPL["run_agent"] = {"loop": loop.run_agent, "langgraph": graph.run_agent}[request.param]
+    return request.param
+
+
 @pytest.fixture
 def repo(tmp_path: Path) -> Path:
     (tmp_path / "pkg").mkdir()
@@ -68,7 +81,7 @@ def run(llm: ScriptedLLM, repo: Path, reports: list[dict[str, Any]], config: Loo
 
     async def go() -> RunResult:
         async with ToolBox([build_repo_tools(repo), sandbox]) as toolbox:
-            return await run_agent(llm, toolbox, TASK, config)
+            return await IMPL["run_agent"](llm, toolbox, TASK, config)
 
     return asyncio.run(go()), sandbox_calls
 
@@ -223,3 +236,40 @@ def test_baseline_install_failure_stops_before_calling_the_llm(repo: Path) -> No
     llm = ScriptedLLM()
     result, _ = run(llm, repo, [{"status": "install_failed", "exit_code": 10, "log_tail": "ReadTimeoutError"}])
     assert result.stop_reason == "sandbox_error" and llm.seen == []
+
+
+def test_both_implementations_emit_identical_traces(tmp_path: Path, impl: str) -> None:
+    """Same scripted session through both: the event streams (what the dashboard and review read)
+    and the results must match exactly, apart from timestamps and durations."""
+    if impl != "loop":
+        pytest.skip("compares both implementations itself; one run is enough")
+
+    def session(run_agent) -> tuple[RunResult, list[dict[str, Any]]]:
+        repo = tmp_path / run_agent.__module__
+        (repo / "pkg").mkdir(parents=True)
+        (repo / "pkg" / "models.py").write_text("from pydantic.fields import ModelField\n", encoding="utf-8")
+        llm = ScriptedLLM(
+            call("read_file", {"path": "pkg/models.py"}),
+            LLMResponse(text="thinking out loud", tool_calls=[], input_tokens=50, output_tokens=5),
+            call("finish", {"summary": "too early"}),
+            call("edit_file", {"path": "pkg/models.py", "old_text": "ModelField", "new_text": "FieldInfo"}),
+            call("finish", {"summary": "done"}),
+        )
+        sandbox, _ = fake_sandbox([FAILING, FAILING, PASSING])
+        events: list[dict[str, Any]] = []
+
+        async def go() -> RunResult:
+            async with ToolBox([build_repo_tools(repo), sandbox]) as toolbox:
+                return await run_agent(llm, toolbox, TASK, LoopConfig(max_steps=6), on_event=events.append)
+
+        result = asyncio.run(go())
+        return result, [{k: v for k, v in e.items() if k not in ("ts", "seconds")} for e in events]
+
+    (loop_result, hand_written), (graph_result, langgraph) = session(loop.run_agent), session(graph.run_agent)
+    # read, nudge (text only), finish rejected, budget warning (3 of 6 steps left), edit, finish verified
+    assert [e["type"] for e in hand_written] == [
+        "start", "test_run", "user_message", "llm_call", "tool_call", "llm_call", "user_message",
+        "llm_call", "test_run", "tool_call", "user_message", "llm_call", "tool_call", "llm_call", "test_run", "tool_call",
+    ]
+    assert langgraph == hand_written
+    assert graph_result == loop_result and loop_result.stop_reason == "finished"
