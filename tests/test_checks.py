@@ -99,3 +99,18 @@ def test_shim_patterns_are_per_library() -> None:
     assert check_diff(diff, "sqlalchemy") == []  # a pydantic.v1 import isn't a SQLAlchemy shim
     assert profile("SQLAlchemy").no_shortcuts in system_prompt("sqlalchemy", "1.4", "2.0", has_docs=False)
     assert profile("unknown-lib") is GENERIC
+
+
+def test_setup_py_install_requires_is_read_without_running_it(tmp_path: Path) -> None:
+    from agent.checks import setup_py_requires
+
+    (tmp_path / "setup.py").write_text(
+        'import os\nfrom setuptools import setup\nos.system("echo should-never-run")\n'
+        'setup(name="x", install_requires=["SQLAlchemy>=1.4,<3.0", "six"])\n', encoding="utf-8")
+    assert set(read_dependencies(tmp_path)) == {"sqlalchemy", "six"}
+    # The run that motivated this: a pin that still allows 1.4 after a 2.0-only migration.
+    before = deps(sqlalchemy="<2.0.0,>=1.1.4")
+    [finding] = check_pins(before, read_dependencies(tmp_path), "sqlalchemy>=2.0,<2.1")
+    assert finding.severity == "warning" and "below 2.0" in finding.message
+    assert setup_py_requires('setup(install_requires=open("r.txt").read().split())') == []
+    assert setup_py_requires("def broken(:") == []

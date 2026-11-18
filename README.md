@@ -1,14 +1,14 @@
 # Migration Agent
 
 An autonomous AI agent that upgrades Python codebases across breaking library releases. Given a
-repository written for **Pydantic v1**, it upgrades the dependency, runs the project's own test
-suite, reads the migration guide, fixes what broke, and verifies the result with the full suite.
-A human then reviews the diff and approves a branch.
+repository written for an old major version (**Pydantic v1** or **SQLAlchemy 1.4**), it upgrades
+the dependency, runs the project's own test suite, reads the migration guide, fixes what broke, and
+verifies the result with the full suite. A human then reviews the diff and approves a branch.
 
-**Result:** on a benchmark of 8 real open-source projects, Claude Haiku 5.5 completed **22 of 23
-migrations** (3 attempts per project), at an average of **$0.03 per run** and **$0.79 for the whole
-24-run experiment**. No run edited or skipped a test, and automatic review checks found no
-shortcuts in any of them.
+**Result:** on a benchmark of 12 real open-source projects across two libraries, Claude Haiku 5.5
+completed **34 of 35 migrations** (3 attempts per project): 22/23 for Pydantic v1 → v2 and 12/12
+for SQLAlchemy 1.4 → 2.0, at about **$0.03 per run**. No run edited or skipped a test. The automatic
+review checks found one weak dependency pin in 35 runs, and no compatibility shims.
 
 | | |
 |---|---|
@@ -24,7 +24,7 @@ shortcuts in any of them.
 
 ```mermaid
 flowchart LR
-    A[Target repo<br/>pinned to Pydantic v1] --> B[Baseline test run<br/>with v2 installed]
+    A[Target repo<br/>pinned to the old version] --> B[Baseline test run<br/>with the new version installed]
     B --> C{Agent loop}
     C -->|search / read / edit| R[repo_tools MCP]
     C -->|run tests| S[sandbox MCP<br/>Docker]
@@ -36,15 +36,19 @@ flowchart LR
     H -->|approve| G[Local branch + commit<br/>+ PR description]
 ```
 
-1. **Baseline.** The repo is installed in a fresh Docker container, Pydantic is upgraded to v2,
-   and the tests run. The failures, grouped by root cause, become the agent's first message.
+1. **Baseline.** The repo is installed in a fresh Docker container, the library is upgraded to
+   the new version, and the tests run. The failures, grouped by root cause, become the agent's first message.
 2. **Loop.** Each step: send the conversation to the model, run the tool it picks, append the
    result. The agent can only act through tools:
    - `repo_tools`: list, search, read and edit files. Edits are exact-text replacements, and a
      failed edit returns the closest matching lines so the model can copy them.
    - `sandbox`: install and run the tests in Docker, and return a **structured summary**: failures
      grouped by root cause, with the error type, message and the deepest `file:line` *inside the repo*.
-   - `docs_search`: search the official Pydantic migration guide.
+   - `docs_search`: search the official migration guides of the library being upgraded (Pydantic's
+     is Markdown, SQLAlchemy's is reStructuredText; both are chunked by heading).
+
+   Library-specific rules (what counts as a shortcut, which imports are compatibility shims) live
+   in one small profile per library (`agent/libraries.py`); the loop itself is library-agnostic.
 3. **Finish is a request, not a declaration.** When the model calls `finish`, the loop runs the
    full suite itself and only stops if it passes; otherwise the model gets the failures back.
 4. **Review checks** run on the final diff and flag what tests can't catch: pins that still allow
@@ -67,7 +71,7 @@ flowchart LR
 
 ## Results
 
-### Benchmark: 8 real projects, Claude Haiku 5.5, docs search on, 3 runs each
+### Pydantic v1 → v2: 8 real projects, Claude Haiku 5.5, docs search on, 3 runs each
 
 Each task is a public repo pinned to a commit that depends on Pydantic v1. A task is only
 accepted after a sandbox check: its own tests pass on v1 and genuinely fail on v2.
@@ -88,6 +92,27 @@ The failed run reached 690/696 before the 40-step limit. The successful run solv
 without touching tests: upstream's own port *changed* a test that expects a `TypeError`, while the
 agent kept v1 behaviour by making `Worker` a plain dataclass and validating its fields with a separate
 Pydantic model in `__post_init__`.
+
+### SQLAlchemy 1.4 → 2.0: 4 real projects, same setup
+
+The upgrade is capped at `<2.1`: uncapped, pip installed 2.1.9, which would mix 2.1's own changes
+into a 2.0 migration. Total cost of the 12 runs: $0.25.
+
+| Project | Difficulty | What breaks under 2.0 | Succeeded | Median steps | Avg cost | Tests after |
+|---|---|---|---|---|---|---|
+| [agate-sql](https://github.com/wireservice/agate-sql) | easy | `MetaData(connection)`, `autoload=True`, `select([...])` | 3/3 | 13 | $0.010 | 18/18 |
+| [coilmq](https://github.com/coilmq/coilmq) | easy | bound `MetaData`, `select([...])`, `row[Column]` | 3/3 | 11 | $0.015 | 201/204* |
+| [dataset](https://github.com/pudo/dataset) | medium | bound `MetaData`, `engine.execute`, library-level autocommit removed | 3/3 | 19 | $0.027 | 57/57† |
+| [rdflib-sqlalchemy](https://github.com/RDFLib/rdflib-sqlalchemy) | medium | `select([...])`, positional `select()`/`delete()` arguments | 3/3 | 22 | $0.032 | 44/48* |
+
+\* Skipped tests are skipped on 1.4 too (other databases). † Two tests call `Table.exists()`, removed
+in 2.0, from the test code itself; they can't pass without editing tests, so the task deselects them.
+
+The interesting one is **dataset**: SQLAlchemy 2.0 no longer commits writes executed directly on a
+connection, but dataset's own API promises that they are saved. All three runs kept that promise
+with explicit `conn.commit()` calls on the 2.0 API, rather than reviving the old behaviour. One
+rdflib-sqlalchemy run left `SQLAlchemy>=1.4,<3.0` in `setup.py`; the pin check flags it, because
+the migrated code no longer works on 1.4.
 
 ### Model comparison (same tasks, earlier runs)
 
@@ -111,15 +136,21 @@ ones and shows no benefit on the hard one. With 3 runs per setting this is a ten
 
 ### Retrieval: why the RAG is mostly keyword search
 
-The docs index was evaluated on 16 queries phrased the way the agent actually searches, mostly
-exact identifiers from error messages (`orm_mode`, `ModelField`, `__fields__`). Right section in the top 3:
+The docs index was evaluated on queries phrased the way the agent actually searches: mostly exact
+identifiers and error messages (`orm_mode`, `ModelField`; `'Engine' object has no attribute
+'execute'`, `select([users.c.id])`). Each library's queries are scored against its own guides only,
+the same filter the agent gets. Right section in the top 3:
 
-| Strategy | Hits (of 16) |
-|---|---|
-| Semantic only (embeddings, the "classic RAG") | 8 |
-| Keyword only (BM25) | 15 |
-| Hybrid, equal weights | 15 |
-| **Hybrid, keyword ×2 (shipped)** | **16** |
+| Strategy | Pydantic (of 16) | SQLAlchemy (of 15) |
+|---|---|---|
+| Semantic only (embeddings, the "classic RAG") | 8 | 13 |
+| Keyword only (BM25) | 15 | 13 |
+| Hybrid, equal weights | 15 | 14 |
+| **Hybrid, keyword ×2 (shipped)** | **16** | **15** |
+
+The two guides favour different methods: Pydantic searches are dominated by identifiers, while
+SQLAlchemy's guide is mostly prose, so embeddings do far better there. Only the hybrid finds the
+right section for every query in both.
 
 ---
 
@@ -144,6 +175,12 @@ behaviour turned out to be caused by the harness, not the model.
 - **Benchmark tasks need real verification.** None of the six candidates found by static code
   review passed its v1 baseline on the first try: test plugins, CLI libraries and git bindings had
   all moved on. Every task is pinned and verified in the sandbox before it's accepted.
+- **Silent checks are the dangerous ones.** The first SQLAlchemy pass scored dataset 0/3: every run
+  stopped at exactly 57/59. A `--deselect` for two impossible tests named the wrong test class, and
+  pytest silently ignores a deselect that matches nothing. The verification had shown it ("59
+  passed" where 57 were expected) and I missed it. A test now checks that every deselected test
+  exists; with the fix, dataset went 3/3. The same pass showed the pin check never read `setup.py`
+  (Pydantic's repos happened not to need it), so a weak pin went unflagged.
 - **Cost is a caching problem.** Each step resends the whole conversation; keeping the history
   append-only lets Claude's prompt cache serve 75–95% of input at a fraction of the price.
 
@@ -158,7 +195,7 @@ Gemini or Groq.
 uv sync
 cp .env.example .env                      # add ANTHROPIC_API_KEY (or another provider's key)
 docker build -t migration-agent-sandbox:py3.11 sandbox
-uv run python -m mcp_servers.docs_search.build    # one-time: download and index the migration guide
+uv run python -m mcp_servers.docs_search.build    # one-time: download and index the migration guides
 
 # Run the agent on one benchmark task (clones it into workspace/)
 uv run --env-file .env python -m agent.loop --task geojson-pydantic
@@ -174,7 +211,7 @@ cd dashboard/web && npm install && npm run build && cd ../..
 uv run uvicorn dashboard.api:app --port 8000
 ```
 
-Tests: `uv run pytest` (about 130 tests; the Docker end-to-end test is opt-in with `-m docker`).
+Tests: `uv run pytest` (about 140 tests; the Docker end-to-end test is opt-in with `-m docker`).
 
 ## Project layout
 
@@ -190,8 +227,9 @@ tests/            tests for this project's own code
 
 ## Limitations and next steps
 
-- **Small benchmark.** 8 projects, so every number above has wide error bars. The goal is 30–50.
-- **One library so far.** SQLAlchemy 1.4 → 2.0 is the planned second migration.
+- **Small benchmark.** 12 projects, so every number above has wide error bars. The goal is 30–50.
+- **The SQLAlchemy tasks are Core-heavy and SQLite-only.** None of them exercises the 2.0-style ORM
+  (`Mapped[]`, `DeclarativeBase`) or a server database; those would be harder tasks.
 - **No memory module yet.** Across ~60 runs no agent repeated a failed fix, so it was deferred
   until a task needs it.
 - **A LangGraph version** of the loop is planned, to compare against the hand-written one.

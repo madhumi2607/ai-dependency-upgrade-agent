@@ -1,0 +1,421 @@
+{
+ "name": "haiku-sqla4",
+ "started_at": "2026-11-18T10:20:50.289427+00:00",
+ "config": {
+  "models": [
+   "claude-haiku-5-5"
+  ],
+  "docs": "on",
+  "tasks": [
+   "dataset",
+   "rdflib-sqlalchemy",
+   "agate-sql",
+   "coilmq"
+  ],
+  "max_steps": 40,
+  "repeats": 3
+ },
+ "rows": [
+  {
+   "task": "dataset",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-144015-dataset",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 19,
+   "input_tokens": 719060,
+   "cache_read_tokens": 655778,
+   "output_tokens": 20863,
+   "cost_usd": 0.023317479999999998,
+   "duration_seconds": 436.270644,
+   "tests_before": {
+    "status": "failed",
+    "passed": 0,
+    "total": 57
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 57,
+    "total": 57
+   },
+   "files_changed": 4,
+   "lines_added": 57,
+   "lines_removed": 38,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1
+  },
+  {
+   "task": "rdflib-sqlalchemy",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-102926-rdflib-sqlalchemy",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 22,
+   "input_tokens": 914316,
+   "cache_read_tokens": 851206,
+   "output_tokens": 18929,
+   "cost_usd": 0.024287559999999996,
+   "duration_seconds": 249.096252,
+   "tests_before": {
+    "status": "failed",
+    "passed": 14,
+    "total": 48
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 44,
+    "total": 48
+   },
+   "files_changed": 3,
+   "lines_added": 55,
+   "lines_removed": 33,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1
+  },
+  {
+   "task": "agate-sql",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-103345-agate-sql",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 13,
+   "input_tokens": 293933,
+   "cache_read_tokens": 264197,
+   "output_tokens": 6924,
+   "cost_usd": 0.00907757,
+   "duration_seconds": 159.300725,
+   "tests_before": {
+    "status": "failed",
+    "passed": 9,
+    "total": 18
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 18,
+    "total": 18
+   },
+   "files_changed": 2,
+   "lines_added": 16,
+   "lines_removed": 15,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1
+  },
+  {
+   "task": "coilmq",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-103635-coilmq",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 31,
+   "input_tokens": 1223244,
+   "cache_read_tokens": 1157117,
+   "output_tokens": 24863,
+   "cost_usd": 0.030615370000000003,
+   "duration_seconds": 1068.856889,
+   "tests_before": {
+    "status": "failed",
+    "passed": 167,
+    "total": 204
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 201,
+    "total": 204
+   },
+   "files_changed": 3,
+   "lines_added": 12,
+   "lines_removed": 12,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1
+  },
+  {
+   "task": "dataset",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-144741-dataset",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 16,
+   "input_tokens": 720741,
+   "cache_read_tokens": 641634,
+   "output_tokens": 26686,
+   "cost_usd": 0.02767004,
+   "duration_seconds": 242.910842,
+   "tests_before": {
+    "status": "failed",
+    "passed": 0,
+    "total": 57
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 57,
+    "total": 57
+   },
+   "files_changed": 3,
+   "lines_added": 73,
+   "lines_removed": 31,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 2
+  },
+  {
+   "task": "rdflib-sqlalchemy",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-110106-rdflib-sqlalchemy",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 24,
+   "input_tokens": 1482896,
+   "cache_read_tokens": 1393473,
+   "output_tokens": 26396,
+   "cost_usd": 0.03607503,
+   "duration_seconds": 309.641864,
+   "tests_before": {
+    "status": "failed",
+    "passed": 14,
+    "total": 48
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 44,
+    "total": 48
+   },
+   "files_changed": 4,
+   "lines_added": 55,
+   "lines_removed": 41,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 2
+  },
+  {
+   "task": "agate-sql",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-110625-agate-sql",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 13,
+   "input_tokens": 288686,
+   "cache_read_tokens": 256789,
+   "output_tokens": 8620,
+   "cost_usd": 0.01006759,
+   "duration_seconds": 144.495543,
+   "tests_before": {
+    "status": "failed",
+    "passed": 9,
+    "total": 18
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 18,
+    "total": 18
+   },
+   "files_changed": 3,
+   "lines_added": 44,
+   "lines_removed": 30,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 2
+  },
+  {
+   "task": "coilmq",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-110859-coilmq",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 9,
+   "input_tokens": 150973,
+   "cache_read_tokens": 124284,
+   "output_tokens": 4467,
+   "cost_usd": 0.00614524,
+   "duration_seconds": 241.111324,
+   "tests_before": {
+    "status": "failed",
+    "passed": 167,
+    "total": 204
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 201,
+    "total": 204
+   },
+   "files_changed": 3,
+   "lines_added": 12,
+   "lines_removed": 12,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 2
+  },
+  {
+   "task": "dataset",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-145154-dataset",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 30,
+   "input_tokens": 1210828,
+   "cache_read_tokens": 1146880,
+   "output_tokens": 24056,
+   "cost_usd": 0.0298916,
+   "duration_seconds": 370.226013,
+   "tests_before": {
+    "status": "failed",
+    "passed": 0,
+    "total": 57
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 57,
+    "total": 57
+   },
+   "files_changed": 4,
+   "lines_added": 69,
+   "lines_removed": 43,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 3
+  },
+  {
+   "task": "rdflib-sqlalchemy",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-112036-rdflib-sqlalchemy",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": "passed_with_findings",
+   "steps": 22,
+   "input_tokens": 1333067,
+   "cache_read_tokens": 1238010,
+   "output_tokens": 25407,
+   "cost_usd": 0.0345893,
+   "duration_seconds": 302.671004,
+   "tests_before": {
+    "status": "failed",
+    "passed": 14,
+    "total": 48
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 44,
+    "total": 48
+   },
+   "files_changed": 3,
+   "lines_added": 55,
+   "lines_removed": 33,
+   "check_errors": 0,
+   "check_warnings": 1,
+   "check_findings": [
+    "[warning] pins: sqlalchemy is pinned to '<3.0,>=1.4', which still allows versions below 2.0 that the migrated code doesn't support."
+   ],
+   "repeat": 3
+  },
+  {
+   "task": "agate-sql",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-112549-agate-sql",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 12,
+   "input_tokens": 287308,
+   "cache_read_tokens": 250836,
+   "output_tokens": 9215,
+   "cost_usd": 0.010763060000000001,
+   "duration_seconds": 150.980367,
+   "tests_before": {
+    "status": "failed",
+    "passed": 9,
+    "total": 18
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 18,
+    "total": 18
+   },
+   "files_changed": 3,
+   "lines_added": 21,
+   "lines_removed": 14,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 3
+  },
+  {
+   "task": "coilmq",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261118-145812-coilmq",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 11,
+   "input_tokens": 192046,
+   "cache_read_tokens": 168206,
+   "output_tokens": 5542,
+   "cost_usd": 0.00683706,
+   "duration_seconds": 553.890833,
+   "tests_before": {
+    "status": "failed",
+    "passed": 167,
+    "total": 204
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 201,
+    "total": 204
+   },
+   "files_changed": 3,
+   "lines_added": 12,
+   "lines_removed": 12,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 3
+  }
+ ],
+ "notes": [
+  "dataset rows from the first pass were dropped and rerun: its --deselect ids named the wrong test class, so 2 impossible tests stayed in and all 3 runs stopped at 57/59 (runs 20261118-102104, -105433, -111309 kept in runs/)."
+ ]
+}

@@ -12,6 +12,7 @@ Check a recorded run:
     uv run python -m agent.checks runs/<run-id>
 """
 
+import ast
 import json
 import re
 import shlex
@@ -70,7 +71,8 @@ def poetry_to_pep440(spec: str) -> str:
 
 def read_dependencies(repo: Path) -> dict[str, SpecifierSet]:
     """Runtime dependencies declared by a repo: name -> version range. Combines pyproject.toml
-    ([project] and [tool.poetry]) and top-level requirements files (not test/dev ones)."""
+    ([project] and [tool.poetry]), setup.py's install_requires and top-level requirements files
+    (not test/dev ones)."""
     deps: dict[str, SpecifierSet] = {}
 
     def add(requirement: str) -> None:
@@ -93,6 +95,10 @@ def read_dependencies(repo: Path) -> dict[str, SpecifierSet]:
                 deps[canonicalize_name(name)] = SpecifierSet(poetry_to_pep440(version))
             except (InvalidSpecifier, ValueError):
                 deps[canonicalize_name(name)] = SpecifierSet()
+    setup_py = repo / "setup.py"
+    if setup_py.is_file():
+        for requirement in setup_py_requires(setup_py.read_text(encoding="utf-8")):
+            add(requirement)
     for path in sorted(repo.glob("*.txt")):
         name = path.name.lower()
         if name.startswith("requirements") and not any(k in name for k in ("test", "dev", "doc", "lint")):
@@ -101,6 +107,25 @@ def read_dependencies(repo: Path) -> dict[str, SpecifierSet]:
                 if line and not line.startswith("-"):
                     add(line)
     return deps
+
+
+def setup_py_requires(source: str) -> list[str]:
+    """The literal install_requires list of a setup.py, read with ast: the file is never executed
+    (it's third-party code). A computed list (e.g. read from a file) yields nothing."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            for kw in node.keywords:
+                if kw.arg == "install_requires":
+                    try:
+                        value = ast.literal_eval(kw.value)
+                    except ValueError:
+                        return []
+                    return [v for v in value if isinstance(v, str)]
+    return []
 
 
 def _minimum(spec: SpecifierSet) -> Version | None:

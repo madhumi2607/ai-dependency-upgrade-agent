@@ -177,9 +177,9 @@ tasks:
     # can never pass without editing tests; they are deselected rather than left as impossible.
     test: >-
       pytest test
-      --deselect test/test_dataset.py::TableTestCase::test_create_table_shorthand1
-      --deselect test/test_dataset.py::TableTestCase::test_create_table_shorthand2
-    baseline: 59 passed on sqlalchemy 1.4; 0/59 on 2.0.58 (bound MetaData, engine.execute, select([...]))
+      --deselect test/test_dataset.py::DatabaseTestCase::test_create_table_shorthand1
+      --deselect test/test_dataset.py::DatabaseTestCase::test_create_table_shorthand2
+    baseline: 57 passed (2 deselected) on sqlalchemy 1.4; 0/57 on 2.0.58 (bound MetaData, engine.execute, select([...]))
     reference_solution: https://github.com/pudo/dataset/pull/443  # also restructures the tests; use source changes only
 
   - id: rdflib-sqlalchemy

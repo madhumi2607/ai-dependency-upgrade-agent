@@ -81,3 +81,32 @@ def test_task_timeout_reaches_the_sandbox() -> None:
     tasks = load_tasks()
     assert tasks["copier"].sandbox_env()["SANDBOX_TIMEOUT_SECONDS"] == "1500"  # slow suite
     assert tasks["geojson-pydantic"].sandbox_env()["SANDBOX_TIMEOUT_SECONDS"] == "600"  # default
+
+
+def test_deselected_tests_exist() -> None:
+    """pytest silently ignores a --deselect that matches nothing. A typo once left two impossible
+    tests in the dataset task, and every run burned its budget on them. Checked against the
+    pinned commit of each task that is cloned locally."""
+    import re
+    import shlex
+
+    checked = 0
+    for task in load_tasks().values():
+        ids = [a for a in re.findall(r"--deselect\s+(\S+)", task.test)]
+        if not ids or not (task.checkout / ".git").is_dir():
+            continue
+        for test_id in ids:
+            path, *names = shlex.split(test_id)[0].split("::")
+            source = subprocess.run(["git", "-C", str(task.checkout), "show", f"{task.commit}:{path}"],
+                                    capture_output=True, text=True, encoding="utf-8").stdout
+            *classes, func = names
+            for cls in classes:
+                assert re.search(rf"^class {cls}\b", source, re.M), f"{task.id}: no class {cls} in {path}"
+            assert re.search(rf"^\s*def {func}\b", source, re.M), f"{task.id}: no test {func} in {path}"
+            if classes:  # the function must be inside that class, not a same-named one elsewhere
+                body = source.split(f"class {classes[-1]}", 1)[1]
+                nxt = re.search(r"^class \w", body, re.M)
+                assert f"def {func}" in body[: nxt.start() if nxt else None], f"{task.id}: {func} is not in {classes[-1]}"
+            checked += 1
+    if not checked:
+        pytest.skip("no task with --deselect is cloned locally")
