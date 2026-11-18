@@ -157,6 +157,75 @@ tasks:
     reference_solution: https://github.com/copier-org/copier/pull/1229
 
 # Rejected tasks, kept so they aren't re-evaluated.
+
+  # ---------- SQLAlchemy 1.4 -> 2.0 ----------
+  # upgrade is capped at <2.1: the task (and the docs the agent searches) is the 2.0 migration;
+  # 2.1's own changes would make it a different task.
+
+  - id: dataset
+    difficulty: medium
+    repo: https://github.com/pudo/dataset
+    commit: b2ab09e58c6f17334e4286009b20887b6a8a8fac  # 1.6.2+, pins sqlalchemy>=1.3.2,<2.0.0
+    library: sqlalchemy
+    old_version: "1.4"
+    new_version: "2.0"
+    install: pip install -e .
+    # alembic 1.13 supports both 1.4 and 2.0, so it doesn't have to move with SQLAlchemy.
+    test_deps: pytest "alembic~=1.13"
+    upgrade: sqlalchemy>=2.0,<2.1
+    # The two shorthand tests call Table.exists() (removed in 2.0) from the test itself, so they
+    # can never pass without editing tests; they are deselected rather than left as impossible.
+    test: >-
+      pytest test
+      --deselect test/test_dataset.py::TableTestCase::test_create_table_shorthand1
+      --deselect test/test_dataset.py::TableTestCase::test_create_table_shorthand2
+    baseline: 59 passed on sqlalchemy 1.4; 0/59 on 2.0.58 (bound MetaData, engine.execute, select([...]))
+    reference_solution: https://github.com/pudo/dataset/pull/443  # also restructures the tests; use source changes only
+
+  - id: rdflib-sqlalchemy
+    difficulty: medium
+    repo: https://github.com/RDFLib/rdflib-sqlalchemy
+    commit: 912ad4a129890dc583b064de14fc3bec4b7f0d87  # 0.5.4+, pins SQLAlchemy>=1.1.4,<2.0.0
+    library: sqlalchemy
+    old_version: "1.4"
+    new_version: "2.0"
+    install: pip install -e .
+    test_deps: pytest six "rdflib==7.0.*" "alembic~=1.13"
+    upgrade: sqlalchemy>=2.0,<2.1
+    # DB=sqlite enables the SQLite graph/context suites; the MySQL/Postgres ones skip themselves (4 skipped).
+    test: env DB=sqlite pytest test
+    baseline: 44 passed, 4 skipped on sqlalchemy 1.4; 30 fail on 2.0.58 (select([...]), positional select()/delete() args)
+    reference_solution: https://github.com/RDFLib/rdflib-sqlalchemy/commit/f058390
+
+  - id: agate-sql
+    difficulty: easy
+    repo: https://github.com/wireservice/agate-sql
+    commit: 98c5817b1cc8c15d75e59279f62a30383cf1b45a  # 0.5.9+, pins sqlalchemy<2
+    library: sqlalchemy
+    old_version: "1.4"
+    new_version: "2.0"
+    install: pip install -e .
+    # crate 0.34 still bundles its SQLAlchemy dialect (used only to compile CREATE TABLE) and works on 1.4 and 2.0.
+    test_deps: pytest geojson "crate==0.34.*" "agate~=1.7.1"
+    upgrade: sqlalchemy>=2.0,<2.1
+    test: pytest
+    baseline: 18 passed on sqlalchemy 1.4; 9 fail on 2.0.58 (MetaData(connection), autoload, select([...]))
+    reference_solution: https://github.com/wireservice/agate-sql/pull/40  # table.py only, tests untouched
+
+  - id: coilmq
+    difficulty: easy
+    repo: https://github.com/coilmq/coilmq
+    commit: b1d407ddb6586acbc95cb2f0915e241fc09d7752  # pins sqlalchemy<2 in the sqlalchemy extra; never migrated upstream
+    library: sqlalchemy
+    old_version: "1.4"
+    new_version: "2.0"
+    install: pip install -e .[sqlalchemy]
+    # typing_extensions: the functional tests import it without declaring it (SQLAlchemy 2.0 happens to pull it in).
+    test_deps: pytest pytest-cov fakeredis typing_extensions
+    upgrade: sqlalchemy>=2.0,<2.1
+    test: pytest
+    baseline: 201 passed, 3 skipped on sqlalchemy 1.4; 34 errors on 2.0.58 (bound MetaData, select([...]), Row[Column])
+
 rejected:
   - id: pydantic-argparse
     repo: https://github.com/SupImDos/pydantic-argparse
