@@ -303,6 +303,7 @@ async def _main(args: argparse.Namespace) -> tuple[RunResult, RunTrace]:
     servers = [_stdio_server("mcp_servers.repo_tools.server"), _stdio_server("mcp_servers.sandbox.server")]
     use_docs = not args.no_docs and docs_index_ready()
     if use_docs:
+        os.environ["DOCS_LIBRARY"] = task.library  # the docs server only searches this library's guides
         servers.append(_stdio_server("mcp_servers.docs_search.server"))
     elif not args.no_docs:
         print("docs_search: index not built, running without it "

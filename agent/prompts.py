@@ -3,6 +3,8 @@
 import json
 from typing import Any
 
+from agent.libraries import profile
+
 SYSTEM_PROMPT = """\
 You are an autonomous software engineer migrating a Python repository from \
 {library} {old_version} to {library} {new_version}.
@@ -17,7 +19,7 @@ if anything still fails you will get the results and must keep working.
 Rules:
 - Fix the code under test, never the tests. Test files cannot be edited, and tests must not be skipped.
 - Do a real migration to the {library} {new_version} API. Do not route around it with \
-compatibility shims that keep the old API alive (for Pydantic: no `pydantic.v1` imports).
+compatibility shims that keep the old API alive ({no_shortcuts}).
 - Update the dependency pin in the project metadata (pyproject.toml, setup.py/setup.cfg or \
 requirements files) so it allows {library} {new_version} and excludes versions the migrated code \
 no longer supports. Also check the pins of companion packages that must move with it (for example \
@@ -54,7 +56,8 @@ def system_prompt(library: str, old_version: str, new_version: str, has_docs: bo
     """has_docs: mention search_docs only when the tool is actually available (it's optional,
     so runs with and without it can be compared)."""
     docs_line = DOCS_LINE.format(library=library) if has_docs else ""
-    return SYSTEM_PROMPT.format(library=library, old_version=old_version, new_version=new_version, docs_line=docs_line)
+    return SYSTEM_PROMPT.format(library=library, old_version=old_version, new_version=new_version, docs_line=docs_line,
+                                no_shortcuts=profile(library).no_shortcuts)
 
 
 def initial_message(library: str, new_version: str, report: dict[str, Any]) -> str:

@@ -6,7 +6,7 @@ The first build also downloads Chroma's local embedding model (~80 MB, cached).
 import os
 from pathlib import Path
 
-from mcp_servers.docs_search.corpus import SOURCES, chunk_markdown, download
+from mcp_servers.docs_search.corpus import SOURCES, chunk_document, download
 from mcp_servers.docs_search.index import DocsIndex
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -22,7 +22,7 @@ def main() -> None:
     chunks = []
     for source in SOURCES:
         text = download(source, path / "sources")
-        source_chunks = chunk_markdown(text, source)
+        source_chunks = chunk_document(text, source)
         print(f"{source.id}: {len(text):,} chars -> {len(source_chunks)} chunks")
         chunks += source_chunks
     DocsIndex(path).build(chunks)

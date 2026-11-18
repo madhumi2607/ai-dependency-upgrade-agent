@@ -28,8 +28,8 @@ from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.utils import canonicalize_name
 from packaging.version import Version
 
-# Imports that keep the old API alive instead of migrating (forbidden by the prompt).
-SHIM_PATTERNS = {"pydantic": [r"\bpydantic\.v1\b", r"from\s+pydantic\s+import\s+v1\b"]}
+from agent.libraries import profile
+
 SKIP_MARKERS = re.compile(r"pytest\.mark\.(skip|skipif|xfail)\b|pytest\.(skip|xfail)\(")
 TEST_PATH = re.compile(r"(^|/)(tests?/|conftest\.py$|test_[^/]*\.py$|[^/]*_test\.py$)")
 
@@ -166,7 +166,8 @@ def parse_diff(diff: str) -> dict[str, list[str]]:
 
 def check_diff(diff: str, library: str) -> list[Finding]:
     findings = []
-    patterns = [re.compile(p) for p in SHIM_PATTERNS.get(library, [])]
+    # Imports that keep the old API alive instead of migrating (forbidden by the prompt).
+    patterns = [re.compile(p) for p in profile(library).shim_patterns]
     for path, lines in parse_diff(diff).items():
         if TEST_PATH.search(path):
             findings.append(Finding("error", "test_integrity", "A test file was changed.", path))

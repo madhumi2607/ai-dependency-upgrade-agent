@@ -88,3 +88,14 @@ def test_run_checks_end_to_end(tmp_path: Path) -> None:
     findings = run_checks(repo, commit, diff, "pydantic>=2,<3", "pydantic")
     assert {(f.check, f.severity) for f in findings} == {("pins", "warning"), ("removed_dependency", "warning")}
     assert (repo / "pyproject.toml").read_text(encoding="utf-8").count("attrs") == 1  # the real checkout is untouched
+
+
+def test_shim_patterns_are_per_library() -> None:
+    from agent.libraries import GENERIC, profile
+    from agent.prompts import system_prompt
+
+    diff = "diff --git a/pkg/db.py b/pkg/db.py\n--- a/pkg/db.py\n+++ b/pkg/db.py\n+from pydantic.v1 import BaseModel\n"
+    assert [f.check for f in check_diff(diff, "pydantic")] == ["compat_shim"]
+    assert check_diff(diff, "sqlalchemy") == []  # a pydantic.v1 import isn't a SQLAlchemy shim
+    assert profile("SQLAlchemy").no_shortcuts in system_prompt("sqlalchemy", "1.4", "2.0", has_docs=False)
+    assert profile("unknown-lib") is GENERIC

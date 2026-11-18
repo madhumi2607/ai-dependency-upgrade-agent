@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 from mcp import Client
 
-from mcp_servers.docs_search.corpus import Source, chunk_markdown, slugify
+from mcp_servers.docs_search.corpus import Source, chunk_document, chunk_markdown, rst_slug, slugify
 from mcp_servers.docs_search.index import BM25, DocsIndex, reciprocal_rank_fusion, tokenize
 from mcp_servers.docs_search.server import build_server
 
@@ -183,3 +183,76 @@ def test_heading_paths_without_a_top_level_title() -> None:
     assert [c.title for c in chunk_markdown(doc, SOURCE)] == [
         "Install", "Migration guide", "Migration guide › Changes to config", "Removed",
     ]
+
+
+RST_SOURCE = Source(id="sqla", library="sqlalchemy", url="https://example.invalid/m.rst",
+                    docs_url="https://docs.example/migration_20.html", format="rst")
+
+RST_GUIDE = """\
+.. _migration_20_toplevel:
+
+======================================
+SQLAlchemy 2.0 - Major Migration Guide
+======================================
+
+Intro text.
+
+Overview
+========
+
+Overview text.
+
+Library-level "Autocommit" removed
+----------------------------------
+
+Use ``engine.begin()``::
+
+    with engine.begin() as conn:
+        conn.execute(text("x"))
+    Not a heading
+    =============
+
+ORM Query - get() method moves to Session
+-----------------------------------------
+
+Use ``session.get()``.
+
+Migrating an Existing Mapping
+=============================
+
+Mapping text.
+"""
+
+
+def test_rst_chunking_nests_by_adornment_style() -> None:
+    chunks = chunk_document(RST_GUIDE, RST_SOURCE)
+    titles = [c.title for c in chunks]
+    top = "SQLAlchemy 2.0 - Major Migration Guide"
+    assert titles == [
+        "sqla",  # the label before the first title
+        top,
+        f"{top} › Overview",
+        f'{top} › Overview › Library-level "Autocommit" removed',
+        f"{top} › Overview › ORM Query - get() method moves to Session",
+        f"{top} › Migrating an Existing Mapping",
+    ]
+    # An underlined line inside an indented code block is code, not a section title.
+    assert "Not a heading" in chunks[3].text
+    assert chunks[4].url == "https://docs.example/migration_20.html#orm-query-get-method-moves-to-session"
+
+
+def test_rst_slug_matches_sphinx_style() -> None:
+    assert rst_slug("Migration to 2.0 Step Six - Add ``__allow_unmapped__``") == "migration-to-2-0-step-six-add-allow-unmapped"
+
+
+def test_server_only_searches_the_task_library(tmp_path: Path) -> None:
+    idx = DocsIndex(tmp_path / "mixed", embedding_function=FakeEmbedding())
+    idx.build(chunk_markdown(GUIDE, SOURCE) + chunk_document(RST_GUIDE, RST_SOURCE))
+
+    async def scenario() -> None:
+        async with Client(build_server(idx, library="sqlalchemy")) as client:
+            result = await client.call_tool("search_docs", {"query": "orm_mode get() Autocommit", "k": 8})
+            titles = [r["title"] for r in result.structured_content["results"]]
+            assert titles and all("SQLAlchemy" in t or t == "sqla" for t in titles)
+
+    asyncio.run(scenario())
