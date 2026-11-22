@@ -5,7 +5,7 @@ Layout of one run:
         meta.json      who/what/when: target repo and commit, model, settings
         events.jsonl   one JSON object per event, in order (see agent/loop.py run_agent)
         result.json    the RunResult, written when the run ends
-        diff.patch     the agent's changes to the target repo (git diff)
+        diff.patch     the agent's changes to the target repo (git diff), byte-for-byte
 
 Events hold only what is new (one model turn, one tool result), not the whole conversation,
 so the files grow linearly with the run; the conversation is rebuilt by replaying them.
@@ -49,8 +49,29 @@ class RunTrace:
         data = asdict(result)
         data["finished_at"] = datetime.now(timezone.utc).isoformat()
         (self.path / "result.json").write_text(json.dumps(data, indent=1, default=str), encoding="utf-8")
-        (self.path / "diff.patch").write_text(_git(self.repo, "diff"), encoding="utf-8")
+        # Byte-for-byte: a text-mode round trip would turn the CRLF lines of CRLF files into LF
+        # on Windows, and the patch would no longer apply to them (see read_diff for older runs).
+        diff = subprocess.run(["git", "-C", str(self.repo), "diff"], capture_output=True)
+        (self.path / "diff.patch").write_bytes(diff.stdout if diff.returncode == 0 else b"")
         self._events.close()
+
+
+def read_diff(run_dir: Path) -> str:
+    """A run's diff.patch as text, with line endings exactly as git produced them.
+
+    Runs recorded before the byte-exact fix stored the diff through text mode on Windows: every
+    line ended in CRLF, including git's own header lines (which git always ends with LF). That
+    format is recognised by its CRLF header line and translated back. Their CRLF *content* lines
+    had already lost the CR, so applying them to CRLF files needs --ignore-whitespace.
+    """
+    path = Path(run_dir) / "diff.patch"
+    if not path.is_file():
+        return ""
+    text = path.read_bytes().decode("utf-8", errors="replace")
+    first_line = text.split("\n", 1)[0]
+    if first_line.startswith("diff --git") and first_line.endswith("\r"):
+        text = text.replace("\r\n", "\n")
+    return text
 
 
 def _git(repo: Path, *args: str) -> str:

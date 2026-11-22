@@ -87,3 +87,53 @@ def test_run_trace_writes_all_files(repo: Path, tmp_path: Path) -> None:
     assert events[0]["type"] == "start" and events[-1]["name"] == "finish"
     assert json.loads((trace.path / "result.json").read_text(encoding="utf-8"))["success"] is True
     assert "+from pydantic.fields import FieldInfo" in (trace.path / "diff.patch").read_text(encoding="utf-8")
+
+
+def _repo_with_crlf_file(tmp_path):
+    import subprocess
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git = ["git", "-C", str(repo), "-c", "user.email=t@t", "-c", "user.name=t", "-c", "core.autocrlf=false"]
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "core.autocrlf", "false"], check=True)
+    (repo / "crlf.py").write_bytes(b"a = 1\r\nb = 2\r\n")
+    (repo / "lf.py").write_bytes(b"c = 3\n")
+    subprocess.run([*git, "add", "-A"], check=True)
+    subprocess.run([*git, "commit", "-qm", "base"], check=True)
+    return repo
+
+
+def test_diff_is_recorded_byte_exact_and_reapplies(tmp_path) -> None:
+    """CRLF files must survive record -> read_diff -> apply (they broke on Windows text mode)."""
+    import subprocess
+    from agent.loop import RunResult
+    from agent.trace import RunTrace, read_diff
+    from mcp_servers.git_tools.tools import apply_patch
+
+    repo = _repo_with_crlf_file(tmp_path)
+    trace = RunTrace.create(tmp_path / "runs", repo, meta={})
+    (repo / "crlf.py").write_bytes(b"a = 10\r\nb = 2\r\n")
+    (repo / "lf.py").write_bytes(b"c = 30\n")
+    trace.finish(RunResult())
+    assert b"a = 10\r\n" in (trace.path / "diff.patch").read_bytes()
+
+    subprocess.run(["git", "-C", str(repo), "checkout", "-q", "--", "."], check=True)
+    apply_patch(repo, read_diff(trace.path), tmp_path / "p.patch")
+    assert (repo / "crlf.py").read_bytes() == b"a = 10\r\nb = 2\r\n" and (repo / "lf.py").read_bytes() == b"c = 30\n"
+
+
+def test_old_text_mode_diffs_still_apply(tmp_path) -> None:
+    """The pre-fix format: every line CRLF (headers too), and CRLF content lines had lost their CR."""
+    from agent.trace import read_diff
+    from mcp_servers.git_tools.tools import apply_patch
+
+    repo = _repo_with_crlf_file(tmp_path)
+    old = ("diff --git a/crlf.py b/crlf.py\n--- a/crlf.py\n+++ b/crlf.py\n@@ -1,2 +1,2 @@\n-a = 1\n+a = 10\n b = 2\n"
+           "diff --git a/lf.py b/lf.py\n--- a/lf.py\n+++ b/lf.py\n@@ -1 +1 @@\n-c = 3\n+c = 30\n").replace("\n", "\r\n")
+    run = tmp_path / "old-run"
+    run.mkdir()
+    (run / "diff.patch").write_bytes(old.encode())
+    diff = read_diff(run)
+    assert "\r" not in diff  # translated back to what git produced (minus the lost CRs)
+    apply_patch(repo, diff, tmp_path / "p.patch")
+    assert (repo / "lf.py").read_bytes() == b"c = 30\n" and b"a = 10" in (repo / "crlf.py").read_bytes()

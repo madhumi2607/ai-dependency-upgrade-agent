@@ -30,6 +30,8 @@ from packaging.utils import canonicalize_name
 from packaging.version import Version
 
 from agent.libraries import profile
+from agent.trace import read_diff
+from mcp_servers.git_tools.tools import apply_patch
 
 SKIP_MARKERS = re.compile(r"pytest\.mark\.(skip|skipif|xfail)\b|pytest\.(skip|xfail)\(")
 TEST_PATH = re.compile(r"(^|/)(tests?/|conftest\.py$|test_[^/]*\.py$|[^/]*_test\.py$)")
@@ -214,9 +216,7 @@ def run_checks(repo: Path, base_commit: str, diff: str, upgrade: str, library: s
         _git(work, "checkout", "--quiet", base_commit)
         before = read_dependencies(work)
         if diff.strip():
-            patch = Path(tmp) / "run.patch"
-            patch.write_text(diff, encoding="utf-8")
-            _git(work, "apply", "--whitespace=nowarn", str(patch))
+            apply_patch(work, diff, Path(tmp) / "run.patch")
         after = read_dependencies(work)
     return [*check_pins(before, after, upgrade), *check_removed_dependencies(before, after), *check_diff(diff, library)]
 
@@ -225,11 +225,10 @@ def check_run(run_dir: Path) -> list[Finding]:
     """Run the checks for a recorded run (runs/<id>/) and write checks.json next to it."""
     meta = json.loads((run_dir / "meta.json").read_text(encoding="utf-8"))
     start = json.loads((run_dir / "events.jsonl").read_text(encoding="utf-8").splitlines()[0])
-    diff_path = run_dir / "diff.patch"
     findings = run_checks(
         repo=Path(meta["repo"]),
         base_commit=meta["repo_commit"],
-        diff=diff_path.read_text(encoding="utf-8") if diff_path.is_file() else "",
+        diff=read_diff(run_dir),
         upgrade=(meta.get("sandbox") or {}).get("SANDBOX_UPGRADE") or "",
         library=start["task"]["library"],
     )

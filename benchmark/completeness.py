@@ -5,7 +5,7 @@ warns (PydanticDeprecatedSince20); SQLAlchemy 2.0 warns for some legacy calls (S
 Tests pass either way, so the success rate can't see it.
 
 For each successful run in a results file, this replays the run's final diff on the task's pinned
-commit, runs the full test suite in the same sandbox with deprecation warnings shown, and counts the
+commit, runs the exact test command it was graded with in the same sandbox, and counts the
 deprecated *call sites in the project's own source* (not tests, not site-packages) that the suite
 hit. 0 means no old API was exercised. It can only see code the tests execute.
 
@@ -26,6 +26,8 @@ from pathlib import Path
 from typing import Any
 
 from agent.checks import TEST_PATH
+from agent.trace import read_diff
+from mcp_servers.git_tools.tools import apply_patch
 from benchmark.runner import RESULTS_DIR, RUNS_DIR, keep_awake
 from benchmark.tasks import Task, load_tasks, prepare_checkout
 from mcp_servers.sandbox.runner import EXPECTED_EXIT_CODES, SandboxConfig, build_docker_command, upgrade_packages
@@ -77,18 +79,21 @@ def parse_deprecations(pytest_log: str, library: str) -> dict[str, list[dict[str
 
 
 def replay(task: Task, run_id: str) -> dict[str, Any]:
-    """Apply runs/<run_id>/diff.patch to the task's commit and run the suite with warnings shown."""
-    diff = (RUNS_DIR / run_id / "diff.patch").read_text(encoding="utf-8")  # universal newlines: CRLF -> LF
+    """Apply runs/<run_id>/diff.patch to the task's commit, run the graded test command, and read
+    the deprecations from pytest's warnings summary."""
+    diff = read_diff(RUNS_DIR / run_id)
     with tempfile.TemporaryDirectory(prefix="completeness-") as tmp:
         repo, out = Path(tmp) / "repo", Path(tmp) / "out"
         out.mkdir()
         _git(None, "clone", "--quiet", "-c", "core.autocrlf=false", "--shared", "--no-checkout", str(task.checkout), str(repo))
         _git(repo, "checkout", "--quiet", task.commit)
         if diff.strip():
-            (Path(tmp) / "run.patch").write_text(diff, encoding="utf-8", newline="\n")
-            _git(repo, "apply", "--whitespace=nowarn", str(Path(tmp) / "run.patch"))
+            apply_patch(repo, diff, Path(tmp) / "run.patch")
+        # Exactly the command the run was graded with: pytest already lists DeprecationWarnings in
+        # its summary by default. (Forcing them on with -W changed a coilmq test's outcome.)
         config = SandboxConfig(repo_root=repo, install_cmd=task.install, upgrade=task.upgrade, test_deps=task.test_deps,
-                               test_cmd=f"{task.test} -W default::DeprecationWarning", timeout_seconds=int(task.timeout_seconds))
+                               test_cmd=task.test, timeout_seconds=int(task.timeout_seconds))
+        measurable = not hides_deprecations(repo)
         name = f"migration-completeness-{uuid.uuid4().hex[:8]}"
         try:
             proc = subprocess.run(build_docker_command(config, out, name, None), capture_output=True, text=True,
@@ -101,10 +106,22 @@ def replay(task: Task, run_id: str) -> dict[str, Any]:
         report = build_report(out, proc.returncode, upgrade_packages(config.upgrade))
         log = (out / "pytest.log").read_text(encoding="utf-8", errors="replace") if (out / "pytest.log").exists() else ""
     sites = parse_deprecations(log, task.library)
-    return {"status": report.get("status"), "counts": report.get("counts"),
+    if not measurable:  # 0 would be misleading: the project's own config hid every deprecation
+        return {"status": report.get("status"), "counts": report.get("counts"), "measurable": False}
+    return {"status": report.get("status"), "counts": report.get("counts"), "measurable": True,
             "library_deprecations": len(sites["library"]), "library_internal": len(sites["library_internal"]),
             "other_deprecations": len(sites["other"]),
             "sites": sites}
+
+
+def hides_deprecations(repo: Path) -> bool:
+    """True if the project's pytest config ignores every DeprecationWarning (e.g. rdflib-sqlalchemy's
+    `ignore::DeprecationWarning`), which makes them invisible to this metric."""
+    for name in ("pytest.ini", "pyproject.toml", "setup.cfg", "tox.ini"):
+        path = repo / name
+        if path.is_file() and re.search(r"ignore::DeprecationWarning\b", path.read_text(encoding="utf-8", errors="replace")):
+            return True
+    return False
 
 
 def _git(cwd: Path | None, *args: str) -> None:

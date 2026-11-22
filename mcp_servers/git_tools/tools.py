@@ -22,6 +22,17 @@ def git(repo: Path, *args: str, check: bool = True) -> str:
     return proc.stdout
 
 
+def apply_patch(repo: Path, diff: str, patch_file: Path) -> None:
+    """Apply a unified diff to a checkout. Written as raw bytes: Windows text mode would add a CR
+    to every line. Diffs recorded before traces became byte-exact lost the CR of CRLF content
+    lines (agent.trace.read_diff), so they only apply to CRLF files with --ignore-whitespace."""
+    patch_file.write_bytes(diff.encode("utf-8"))
+    try:
+        git(repo, "apply", "--whitespace=nowarn", str(patch_file))
+    except GitError:
+        git(repo, "apply", "--whitespace=nowarn", "--ignore-whitespace", str(patch_file))
+
+
 def branch_exists(repo: Path, branch: str) -> bool:
     return bool(git(repo, "branch", "--list", branch).strip())
 
@@ -39,9 +50,7 @@ def commit_diff_on_branch(repo: Path, base_commit: str, branch: str, diff: str, 
         worktree = Path(tmp) / "wt"
         git(repo, "worktree", "add", "--quiet", "-b", branch, str(worktree), base_commit)
         try:
-            patch = Path(tmp) / "run.patch"
-            patch.write_text(diff, encoding="utf-8")
-            git(worktree, "apply", "--whitespace=nowarn", str(patch))
+            apply_patch(worktree, diff, Path(tmp) / "run.patch")
             git(worktree, "add", "--all")
             git(worktree, "commit", "--quiet", "-m", message)
             return git(worktree, "rev-parse", "HEAD").strip()

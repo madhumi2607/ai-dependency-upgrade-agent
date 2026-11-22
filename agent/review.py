@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from agent.trace import read_diff
 from dashboard.runs import read_checks, summarize
 from mcp_servers.git_tools.tools import GitError, commit_diff_on_branch, diff_stat
 
@@ -23,10 +24,9 @@ from mcp_servers.git_tools.tools import GitError, commit_diff_on_branch, diff_st
 def load_run(run_dir: Path) -> dict[str, Any]:
     meta = json.loads((run_dir / "meta.json").read_text(encoding="utf-8"))
     start = json.loads((run_dir / "events.jsonl").read_text(encoding="utf-8").splitlines()[0])
-    diff_path = run_dir / "diff.patch"
     return {
         "dir": run_dir, "meta": meta, "task": start["task"], "summary": summarize(run_dir),
-        "checks": read_checks(run_dir) or [], "diff": diff_path.read_text(encoding="utf-8") if diff_path.is_file() else "",
+        "checks": read_checks(run_dir) or [], "diff": read_diff(run_dir),
     }
 
 
