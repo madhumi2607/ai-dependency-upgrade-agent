@@ -7,8 +7,10 @@ verifies the result with the full suite. A human then reviews the diff and appro
 
 **Result:** on a benchmark of 12 real open-source projects across two libraries, Claude Haiku 5.5
 completed **34 of 35 migrations** (3 attempts per project): 22/23 for Pydantic v1 → v2 and 12/12
-for SQLAlchemy 1.4 → 2.0, at about **$0.03 per run**. No run edited or skipped a test. The automatic
-review checks found one weak dependency pin in 35 runs, and no compatibility shims.
+for SQLAlchemy 1.4 → 2.0, at about **$0.03 per run**. No run edited or skipped a test. Passing tests
+isn't the whole story, so completeness was measured too: in 90% of measurable successful runs no
+deprecated old-version API is left; the exceptions are all one project, where the agent migrated the
+library but left v1 config in its example modules (see "What the success rate does and doesn't measure").
 
 | | |
 |---|---|
@@ -113,6 +115,42 @@ connection, but dataset's own API promises that they are saved. All three runs k
 with explicit `conn.commit()` calls on the 2.0 API, rather than reviving the old behaviour. One
 rdflib-sqlalchemy run left `SQLAlchemy>=1.4,<3.0` in `setup.py`; the pin check flags it, because
 the migrated code no longer works on 1.4.
+
+### What the success rate does and doesn't measure
+
+"Succeeded" means the project's own full test suite passes on the new version, with no test
+edited or skipped (enforced by the tools, then checked on the diff). That is necessary for a
+correct migration but not sufficient, so three more things were measured or stated:
+
+**Migration completeness.** Pydantic v2 still *runs* most v1-style code (`.dict()`, `@validator`,
+`class Config`) and only warns, so tests can pass on a half-done migration. `benchmark/completeness.py`
+replays every successful run's diff on the pinned commit, runs the exact graded test command, and
+counts the deprecated old-API call sites in the project's own source that the suite still hits.
+
+| | Runs | Measurable | No deprecated API left |
+|---|---|---|---|
+| Hand-written loop | 34 | 31 | 28 |
+| LangGraph | 35 | 32 | 29 |
+| **Total** | **69** | **63** | **57 (90%)** |
+
+All 69 replays reproduced the original result. The 6 that aren't measurable are rdflib-sqlalchemy,
+whose pytest config hides every `DeprecationWarning`. **The 6 incomplete ones are every pydantic-cli
+run, in both agents:** the core was migrated, but v1 `class Config` blocks were left in the package's
+`examples/` modules (10–29 call sites), which the tests import and v2 still accepts with a warning.
+A migration a user would copy from those examples is still v1. The metric only sees code the tests
+execute; it was checked against a positive control (geojson-pydantic's unmigrated code is flagged).
+
+**Task selection.** Tasks are chosen so their *tests* only use APIs that survive the upgrade,
+because the agent may not edit tests. That's a deliberate rule, but it means projects whose own test
+suites are tied to the old version aren't represented. Several candidates were rejected for exactly
+that (listed with reasons in `benchmark/tasks.yaml`).
+
+**No held-out tests.** The agent is graded by the same suite it can run. Completeness and the
+review checks are the independent signals; grading against upstream's own post-migration tests
+(where upstream ported) is the next step.
+
+Full traces for every run in these tables are in `benchmark/traces/` (scrubbed of local paths and
+emails); unpack into `runs/` to inspect them in the dashboard.
 
 ### Model comparison (same tasks, earlier runs)
 
@@ -263,7 +301,9 @@ tests/            tests for this project's own code
 
 ## Limitations and next steps
 
-- **Small benchmark.** 12 projects, so every number above has wide error bars. The goal is 30–50.
+- **Small benchmark.** 18 verified projects (results above cover the first 12), so every number has
+  wide error bars. Small SQLAlchemy libraries that pinned `<2` *and* have SQLite-only tests that
+  survive the upgrade turned out to be rare; most candidates were rejected.
 - **The SQLAlchemy tasks are Core-heavy and SQLite-only.** None of them exercises the 2.0-style ORM
   (`Mapped[]`, `DeclarativeBase`) or a server database; those would be harder tasks.
 - **No memory module yet.** Across ~60 runs no agent repeated a failed fix, so it was deferred
