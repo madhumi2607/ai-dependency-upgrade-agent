@@ -37,7 +37,7 @@ def llm_call(step: int, inp: int, cached: int, out: int) -> dict[str, Any]:
 def runs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     runs = tmp_path / "runs"
     write_run(runs, "20261019-100000-geojson-pydantic", [
-        {"type": "start"}, {"type": "test_run", "purpose": "baseline", "report": FAILED_REPORT},
+        {"type": "start", "task": {"library": "pydantic", "old_version": "1", "new_version": "2"}}, {"type": "test_run", "purpose": "baseline", "report": FAILED_REPORT},
         llm_call(1, 2_000, 0, 100), llm_call(2, 10_000, 2_000, 400),
         {"type": "test_run", "purpose": "verification", "report": PASSED_REPORT},
     ], result={"success": True, "stop_reason": "finished", "summary": "Migrated.", "finished_at": "2026-10-19T10:07:30+00:00"})
@@ -66,6 +66,7 @@ def test_summary_of_finished_run(runs: Path) -> None:
     assert s["duration_seconds"] == 450 and s["repo"] == "geojson-pydantic" and s["repo_commit"] == "8a07ab8"
     assert s["cost_usd"] == pytest.approx((10_000 * 4 + 2_000 * 0.2 + 500 * 20) / 1e6)
     assert (s["check_errors"], s["check_warnings"]) == (0, 1)
+    assert (s["impl"], s["library"]) == ("loop", "pydantic")  # no "impl" in meta: an older loop run
 
 
 def test_summary_of_live_run(runs: Path) -> None:

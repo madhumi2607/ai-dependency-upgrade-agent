@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { navigate } from "./App";
 import { useRuns } from "./api";
 import { cachedShare, formatCost, formatDuration, formatTests, formatTime, formatTokens } from "./format";
@@ -53,11 +54,39 @@ function ChecksCell({ errors, warnings }: { errors: number | null; warnings: num
   );
 }
 
+type Option = { value: string; label: string };
+
+function Segmented({ label, options, value, onChange }: { label: string; options: Option[]; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="seg-group" role="group" aria-label={label}>
+      <span className="muted small">{label}</span>
+      <div className="seg">
+        {options.map((o) => (
+          <button key={o.value} className={o.value === value ? "active" : ""} aria-pressed={o.value === value} onClick={() => onChange(o.value)}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const IMPLS: Option[] = [{ value: "all", label: "All" }, { value: "loop", label: "Hand-written" }, { value: "langgraph", label: "LangGraph" }];
+const LIBRARY_NAMES: Record<string, string> = { pydantic: "Pydantic", sqlalchemy: "SQLAlchemy" };
+
 export default function RunsPage() {
-  const { data: runs, error } = useRuns();
+  const { data: allRuns, error } = useRuns();
+  const [impl, setImpl] = useState("all");
+  const [library, setLibrary] = useState("all");
 
   if (error) return <p className="error">Could not load runs: {error}</p>;
-  if (!runs) return <p className="muted">Loading…</p>;
+  if (!allRuns) return <p className="muted">Loading…</p>;
+
+  const libraries: Option[] = [
+    { value: "all", label: "All" },
+    ...[...new Set(allRuns.map((r) => r.library).filter((l): l is string => !!l))].sort().map((l) => ({ value: l, label: LIBRARY_NAMES[l] ?? l })),
+  ];
+  const runs = allRuns.filter((r) => (impl === "all" || r.impl === impl) && (library === "all" || r.library === library));
 
   return (
     <>
@@ -67,13 +96,20 @@ export default function RunsPage() {
           <div className="muted small">Every agent run recorded in runs/, newest first</div>
         </div>
       </div>
-      {runs.length === 0 ? (
+      {allRuns.length > 0 && (
+        <div className="filters">
+          <Segmented label="Agent" options={IMPLS} value={impl} onChange={setImpl} />
+          {libraries.length > 2 && <Segmented label="Library" options={libraries} value={library} onChange={setLibrary} />}
+        </div>
+      )}
+      {allRuns.length === 0 ? (
         <div className="card empty">
           No runs yet. Start one with <code>uv run --env-file .env python -m agent.loop</code>.
         </div>
       ) : (
         <>
           <Headline runs={runs} />
+          {runs.length === 0 && <div className="card empty">No runs match these filters.</div>}
           <div className="table-wrap">
             <table className="runs">
               <thead>
@@ -99,6 +135,7 @@ export default function RunsPage() {
                     <td>
                       <span className="mono small">{r.model}</span>
                       {r.effort && <div className="muted small">effort {r.effort}</div>}
+                      {r.impl === "langgraph" && <span className="impl-tag">LangGraph</span>}
                     </td>
                     <td><StatusBadge status={r.status} stopReason={r.stop_reason} /></td>
                     <td className="num mono">{formatTests(r.tests_before)} → {formatTests(r.tests_after)}</td>

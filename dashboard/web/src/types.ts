@@ -12,6 +12,8 @@ export type RunSummary = {
   provider: string | null;
   model: string | null;
   effort: string | null;
+  impl: "loop" | "langgraph";
+  library: string | null;
   status: "running" | "succeeded" | "failed";
   stop_reason: string | null;
   error: string | null;

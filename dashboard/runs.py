@@ -81,6 +81,9 @@ def summarize(run_dir: Path) -> dict[str, Any]:
         "provider": meta.get("provider"),
         "model": meta.get("model"),
         "effort": meta.get("effort"),
+        # Which agent produced the run (older runs predate agent_langgraph, so they're the loop).
+        "impl": meta.get("impl") or "loop",
+        "library": next((e.get("task", {}).get("library") for e in events if e["type"] == "start"), None),
         "status": status,
         "stop_reason": result.get("stop_reason") if result else None,
         "error": result.get("error") if result else None,

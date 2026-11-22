@@ -237,3 +237,19 @@ details.is-error .tool-name { color: var(--critical-text); }
 .test-card { margin: 0; padding: 10px 14px; }
 .failures { margin: 8px 0 0; padding-left: 18px; color: var(--text-2); }
 .failures li { margin-bottom: 6px; }
+
+/* ---------- runs filters ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: -4px 0 16px; }
+.seg-group { display: flex; align-items: center; gap: 8px; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.seg button {
+  background: none; border: none; border-left: 1px solid var(--border); color: var(--text-2);
+  padding: 4px 11px; font: inherit; font-size: 0.82rem; cursor: pointer;
+}
+.seg button:first-child { border-left: none; }
+.seg button:hover { background: var(--surface-2); }
+.seg button.active { background: var(--surface-2); color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+.impl-tag {
+  display: inline-block; margin-top: 3px; padding: 0 6px; border: 1px solid var(--border-strong);
+  border-radius: 4px; font-size: 0.72rem; color: var(--text-2);
+}
