@@ -257,6 +257,7 @@ mcp_servers/      repo_tools/, sandbox/, docs_search/, git_tools/
 sandbox/          Dockerfile + entrypoint for running a target repo's tests
 benchmark/        tasks.yaml (verified tasks), runner.py (experiments), results/ (committed results)
 dashboard/        FastAPI backend + React frontend over runs/
+docs/             WRITEUP.md (design decisions and lessons), DEMO_SCRIPT.md
 tests/            tests for this project's own code
 ```
 
