@@ -12,7 +12,7 @@ review checks found one weak dependency pin in 35 runs, and no compatibility shi
 
 | | |
 |---|---|
-| Agent loop | hand-written Python, no agent framework |
+| Agent loop | hand-written Python, plus an equivalent LangGraph version for comparison |
 | Tools | [MCP](https://modelcontextprotocol.io) servers: repo tools, Docker test sandbox, docs search, git |
 | Models | Claude (default), Gemini, Groq behind one small interface |
 | Verification | the project's own tests in Docker, plus automatic review checks on the final diff |
@@ -123,6 +123,35 @@ the migrated code no longer works on 1.4.
 
 On these tasks Haiku succeeds about as reliably as Opus at **20–50× lower cost**.
 
+### Hand-written loop vs LangGraph (Haiku, all 12 tasks, 3 runs each)
+
+The same agent was rebuilt as a LangGraph `StateGraph` (`agent_langgraph/`): nodes for baseline,
+model call, tools, nudge and final run, with routing functions between them. It deliberately reuses
+the same LLM client, MCP tools, prompts, budgets and trace format, so only the orchestration differs;
+a test runs one scripted session through both and asserts identical event streams.
+
+| | Hand-written loop | LangGraph |
+|---|---|---|
+| Succeeded | 34/35 | 35/36 |
+| Median steps | 17 | 19 |
+| Mean cost per run | $0.028 | $0.026 |
+| Review-check findings | 1 warning (a weak pin) | none |
+| Code for the control flow | 75 lines | 143 lines |
+| New dependencies | none | `langgraph` (+ ~20 packages) |
+
+Per task, the two are within run-to-run noise of each other (copier, the only task either one
+failed, went 1/2 vs 2/3). That is the expected result: with the model, tools and prompts held
+constant, the framework doesn't change *what* the agent does. What it changes is the code. The graph
+makes the control flow explicit and testable (each routing decision is a small named function), makes
+the append-only history structural (nodes can only *add* messages via a reducer), and comes with
+hooks for checkpointing and human-in-the-loop interrupts. It costs twice the code for this loop, a
+dependency tree, and a recursion limit that has to be set above the agent's own budgets. For a
+single-agent loop this size, the hand-written version is simpler; LangGraph would pay off with
+branching workflows, resumable runs or several cooperating agents.
+
+The loop's runs are from 17–18 Nov, LangGraph's from 18–22 Nov; the only code change in between
+that reaches the model is the per-library wording of one prompt rule.
+
 ### Does docs search help? (Haiku, 3 runs per setting)
 
 | Project | Success (off → on) | Median steps (off → on) |
@@ -181,6 +210,11 @@ behaviour turned out to be caused by the harness, not the model.
   passed" where 57 were expected) and I missed it. A test now checks that every deselected test
   exists; with the fix, dataset went 3/3. The same pass showed the pin check never read `setup.py`
   (Pydantic's repos happened not to need it), so a weak pin went unflagged.
+- **Laptops sleep in the middle of experiments.** Sleep pauses Docker and drops the network, so a
+  test run outlives the MCP timeout or the model's HTTP stream breaks; several LangGraph runs were
+  lost this way (recorded as infrastructure failures and rerun, never counted as agent failures). Blocking
+  idle sleep wasn't enough: on a Modern Standby laptop the screen turning off *is* the sleep trigger,
+  so the runner now asks Windows to keep the display on for the length of an experiment.
 - **Cost is a caching problem.** Each step resends the whole conversation; keeping the history
   append-only lets Claude's prompt cache serve 75–95% of input at a fraction of the price.
 
@@ -211,13 +245,14 @@ cd dashboard/web && npm install && npm run build && cd ../..
 uv run uvicorn dashboard.api:app --port 8000
 ```
 
-Tests: `uv run pytest` (about 140 tests; the Docker end-to-end test is opt-in with `-m docker`).
+Tests: `uv run pytest` (about 150 tests; the Docker end-to-end test is opt-in with `-m docker`).
 
 ## Project layout
 
 ```
-agent/            loop.py (the agent loop), llm.py (Claude/Gemini/Groq), prompts.py,
+agent/            loop.py (the agent loop), llm.py (Claude/Gemini/Groq), prompts.py, libraries.py,
                   trace.py (run recording), checks.py (review checks), review.py (human review)
+agent_langgraph/  graph.py (the same agent as a LangGraph StateGraph), run.py (its CLI)
 mcp_servers/      repo_tools/, sandbox/, docs_search/, git_tools/
 sandbox/          Dockerfile + entrypoint for running a target repo's tests
 benchmark/        tasks.yaml (verified tasks), runner.py (experiments), results/ (committed results)
@@ -232,4 +267,5 @@ tests/            tests for this project's own code
   (`Mapped[]`, `DeclarativeBase`) or a server database; those would be harder tasks.
 - **No memory module yet.** Across ~60 runs no agent repeated a failed fix, so it was deferred
   until a task needs it.
-- **A LangGraph version** of the loop is planned, to compare against the hand-written one.
+- **The LangGraph version doesn't use LangGraph's extras yet** (checkpointing to resume a run after
+  a crash, an interrupt node for human review); those are where it would start to earn its cost.

@@ -27,6 +27,25 @@ RESULTS_DIR = Path(__file__).parent / "results"
 RUNS_DIR = PROJECT_ROOT / "runs"
 
 
+def keep_awake(on: bool) -> None:
+    """Stop Windows from idle-sleeping while an experiment runs (no-op elsewhere).
+
+    Sleep pauses the Docker VM mid test run and drops the network, so the agent's MCP call times
+    out or its LLM connection breaks, and the run is lost as an infrastructure failure (it cost
+    several LangGraph runs). This is the API video players use, and it only lasts while this process
+    lives; lid-close and shutdown still work.
+
+    DISPLAY_REQUIRED matters on laptops with Modern Standby (S0ix): there, the screen turning off
+    *is* the trigger for standby, and SYSTEM_REQUIRED alone doesn't prevent it."""
+    if sys.platform != "win32":
+        return
+    import ctypes
+
+    ES_CONTINUOUS, ES_SYSTEM_REQUIRED, ES_DISPLAY_REQUIRED = 0x80000000, 0x00000001, 0x00000002
+    flags = ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED if on else 0
+    ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | flags)
+
+
 def reset_checkout(task: Task) -> None:
     """Discard the previous run's edits. Safe: every run's diff is already in runs/<id>/diff.patch."""
     if not (task.checkout / ".git").is_dir():
@@ -157,6 +176,7 @@ def main() -> None:
         print(f"Resuming {out.name}: keeping {len(done)} results, running {len(plan) - len(done)}.")
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     rows: dict[tuple, dict[str, Any]] = dict(done)
+    keep_awake(True)
     for i, (repeat, task, model, docs) in enumerate(plan, 1):
         k = (repeat, task.id, model, docs)
         if k in done:
@@ -180,6 +200,7 @@ def main() -> None:
             print(f"  -> {'OK' if row['success'] else 'FAIL'} · {row['steps']} steps · {cost} · {row['run_id']}", flush=True)
         experiment["rows"] = [rows[(r, t.id, m, d)] for (r, t, m, d) in plan if (r, t.id, m, d) in rows]
         out.write_text(json.dumps(experiment, indent=1, default=str), encoding="utf-8")  # saved after every run
+    keep_awake(False)
     for task in tasks:
         reset_checkout(task)
 
