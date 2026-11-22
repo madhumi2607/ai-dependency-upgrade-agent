@@ -227,3 +227,12 @@ def test_startup_error_from_a_plain_python_traceback() -> None:
     assert group["message"] == "No module named 'pytest_httpx._options'"
     # Deepest frame inside the repo, not the one in site-packages.
     assert group["location"] == "connect/eaas/core/testing/testclient.py:16"
+
+
+def test_startup_error_without_a_traceback_shows_the_log() -> None:
+    """pytest rejecting its own options writes no traceback; the summary must not be empty."""
+    log = ("ERROR: usage: pytest [options] [file_or_dir] [file_or_dir] [...]\n"
+           "pytest: error: unrecognized arguments: --cov --cov-report term tests\n"
+           "  inifile: /work/pyproject.toml\n  rootdir: /work\n")
+    group = report.parse_startup_error(log)
+    assert "unrecognized arguments: --cov" in group["message"]

@@ -175,6 +175,11 @@ def parse_startup_error(log: str) -> dict[str, Any]:
     details = parse_traceback(tail)
     if not details["error_type"] and not details["message"]:
         details = parse_python_traceback(tail)
+    if not details["error_type"] and not details["message"]:
+        # Not a traceback at all, e.g. pytest rejecting its own options ("pytest: error:
+        # unrecognized arguments: --cov ..." when addopts needs a missing plugin). Show the
+        # log's last lines rather than an empty summary.
+        details = {**details, "message": "\n".join(l for l in tail.splitlines() if l.strip())[-MAX_MESSAGE_CHARS:]}
     return {
         "kind": "startup_error",
         **details,
