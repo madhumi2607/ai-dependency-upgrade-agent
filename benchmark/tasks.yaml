@@ -226,6 +226,107 @@ tasks:
     test: pytest
     baseline: 201 passed, 3 skipped on sqlalchemy 1.4; 34 errors on 2.0.58 (bound MetaData, select([...]), Row[Column])
 
+  # ---------- second batch (Pydantic) ----------
+
+  - id: confz
+    difficulty: easy
+    repo: https://github.com/Zuehlke/ConfZ
+    commit: 30f7e0117a9566e6f92fe75966441a51e7a9d7af  # pins pydantic ^1.9.0
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    install: pip install -e .
+    # Two async tests need an asyncio plugin; old pytest/pytest-asyncio match the repo's era.
+    test_deps: '"pytest>=7,<8" "pytest-asyncio<0.24"'
+    upgrade: pydantic>=2,<3
+    # test_allow_deny asserts that an Optional[str] field with no default is None: v1 behaviour that
+    # v2 deliberately changed (the field becomes required), and the test model is in the test file.
+    test: pytest tests -o asyncio_mode=auto --deselect tests/loaders/test_env_loader.py::test_allow_deny
+    baseline: 42 passed on pydantic 1.10; 9 fail on 2.14 (inner Config allow_mutation)
+    reference_solution: https://github.com/Zuehlke/ConfZ/commit/ef46286  # changed that one test line
+
+  - id: withings-api
+    difficulty: medium
+    repo: https://github.com/vangorra/python_withings_api
+    commit: 69c21c32449b0900b4837c1299dde0611a0b8c87  # archived; pins pydantic ^1.7.2
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    install: pip install -e .
+    # pytest-cov: the repo's addopts use --cov. responses: HTTP is mocked, no network.
+    test_deps: pytest pytest-cov responses
+    upgrade: pydantic>=2,<3
+    test: pytest tests
+    baseline: 32 passed on pydantic 1.10; 17 fail on 2.14 (__get_validators__ custom types, validators)
+
+  - id: netlist
+    difficulty: hard
+    repo: https://github.com/dan-fritchman/Netlist
+    commit: 56790e83efd50725f8648f1afa3e3634d49e022d  # pins pydantic ^1.7.3
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    install: pip install -e .
+    test_deps: pytest
+    upgrade: pydantic>=2,<3
+    test: pytest tests
+    baseline: 20 passed on pydantic 1.10; import error on 2.14 (GenericModel, __pydantic_model__, pydantic dataclasses)
+
+  - id: morecantile
+    difficulty: medium
+    repo: https://github.com/developmentseed/morecantile
+    commit: ecabdd1f4a22a8f85e4d8721d03e20d621e64ce6  # tag 4.2.1, pins pydantic~=1.0
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    install: pip install -e ".[test]"
+    test_deps: pytest
+    upgrade: pydantic>=2,<3
+    # test_tile_matrix_set reads crs.__root__ (a v1 custom-root internal) in the test itself.
+    test: pytest tests --deselect tests/test_models.py::test_tile_matrix_set
+    baseline: 183 passed, 3 skipped on pydantic 1.10; import error on 2.14 (conlist min_items, __root__)
+    reference_solution: https://github.com/developmentseed/morecantile/commit/0015490  # changed only that test
+
+  - id: basin3d
+    difficulty: medium
+    repo: https://github.com/BASIN-3D/basin3d
+    commit: b208f3bc1b00e1034cb704a30aa41c63d57122a2  # still pins pydantic<2 upstream
+    library: pydantic
+    old_version: "1"
+    new_version: "2"
+    install: pip install -e .
+    test_deps: pytest
+    upgrade: pydantic>=2,<3
+    # Excluded: integration tests (network) and the AmeriFlux/ARM plugin tests, which need optional
+    # extras (xarray etc.) unrelated to Pydantic. pytest.ini adds --mypy, hence -p no:mypy / addopts.
+    test: >-
+      pytest tests --ignore=tests/integration
+      --ignore=tests/test_plugins_amf.py --ignore=tests/test_plugins_amf_functions.py
+      --ignore=tests/test_plugins_arm.py --ignore=tests/test_plugins_arm_functions.py
+      -p no:mypy -o addopts=""
+    timeout_seconds: 1200
+    baseline: 484 passed, 2 skipped on pydantic 1.10; import error on 2.14 (__get_validators__ type, class Config)
+
+  # ---------- second batch (SQLAlchemy) ----------
+
+  - id: sqladmin
+    difficulty: easy
+    repo: https://github.com/aminalaee/sqladmin
+    commit: e88b36dab59a3b5a73274f829b90f4dbec02c30f  # pins sqlalchemy >=1.4,<1.5
+    library: sqlalchemy
+    old_version: "1.4"
+    new_version: "2.0"
+    install: pip install -e .
+    # Era pins for the repo's 2023 test stack; wtforms<3.1 renders the empty <option> the tests expect.
+    test_deps: >-
+      pytest aiosqlite "httpx==0.23.0" "sqlalchemy_utils==0.38.3" email-validator python-dateutil
+      greenlet itsdangerous "starlette<0.24" "wtforms<3.1" babel
+    upgrade: sqlalchemy>=2.0,<2.1
+    # sqlmodel 0.0.8 pins SQLAlchemy 1.4, so its integration test can't run on 2.0 at all.
+    test: pytest tests --ignore=tests/test_integrations/test_sqlmodel.py
+    baseline: 140 passed, 2 skipped on sqlalchemy 1.4; 38 fail on 2.0.58 (string loader options)
+    reference_solution: https://github.com/aminalaee/sqladmin/pull/411  # test changes: a rename only
+
 rejected:
   - id: pydantic-argparse
     repo: https://github.com/SupImDos/pydantic-argparse
@@ -234,3 +335,23 @@ rejected:
       Tests depend on Pydantic v1 internals (tests/conftest.py uses pydantic.fields.ModelField.infer
       and pydantic.BaseSettings; test_parser.py uses __fields__, outer_type_, field_info), so the suite
       cannot pass under v2 without editing tests. Upstream only moved to the pydantic.v1 shim.
+  - id: pydantic-dict
+    repo: https://github.com/aaraney/pydantic_dict
+    commit: 5409001f46a6ddb21d494f3999cdd4328e517cd0
+    reason: >-
+      Tests subclass `class Config(KVModel.Config)`, i.e. they depend on v1 config-class inheritance,
+      which v2 removed; the suite can't pass under v2 without editing tests.
+  - id: streamdeck-yaml
+    repo: https://github.com/basnijholt/home-assistant-streamdeck-yaml
+    commit: a87daa4be81c10b7c72b238fb69f90b08d0f0e17
+    reason: Needs the cairo system library, which the sandbox image doesn't have (33 baseline failures).
+  - id: sqlalchemy-mptt
+    repo: https://github.com/uralbash/sqlalchemy_mptt
+    commit: f4426830a6c5d0613c8289925bf3f764ce92059d
+    reason: >-
+      A test module imports sqlalchemy.ext.declarative.declarative_base, which raises MovedIn20Warning,
+      and the suite turns warnings into errors; it errors on 1.4 already and can't pass without editing tests.
+  - id: goodconf
+    repo: https://github.com/lincolnloop/goodconf
+    commit: 3db76bcb6f759f7f9042b9c7fbd32e6a3af11e47
+    reason: Tests pass pydantic v1 ModelField objects (C.__fields__["f"]) to the library; upstream's port changed 4 test files.
