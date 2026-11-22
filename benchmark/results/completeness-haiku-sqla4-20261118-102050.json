@@ -1,0 +1,242 @@
+{
+ "20261118-144015-dataset": {
+  "task": "dataset",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 57,
+   "passed": 57,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-102926-rdflib-sqlalchemy": {
+  "task": "rdflib-sqlalchemy",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 48,
+   "passed": 44,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 4
+  },
+  "measurable": false
+ },
+ "20261118-103345-agate-sql": {
+  "task": "agate-sql",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-144741-dataset": {
+  "task": "dataset",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 57,
+   "passed": 57,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-103635-coilmq": {
+  "task": "coilmq",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 204,
+   "passed": 201,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 3
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-110106-rdflib-sqlalchemy": {
+  "task": "rdflib-sqlalchemy",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 48,
+   "passed": 44,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 4
+  },
+  "measurable": false
+ },
+ "20261118-110625-agate-sql": {
+  "task": "agate-sql",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-145154-dataset": {
+  "task": "dataset",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 57,
+   "passed": 57,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-110859-coilmq": {
+  "task": "coilmq",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 204,
+   "passed": 201,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 3
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-112036-rdflib-sqlalchemy": {
+  "task": "rdflib-sqlalchemy",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 48,
+   "passed": 44,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 4
+  },
+  "measurable": false
+ },
+ "20261118-112549-agate-sql": {
+  "task": "agate-sql",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261118-145812-coilmq": {
+  "task": "coilmq",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 204,
+   "passed": 201,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 3
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ }
+}

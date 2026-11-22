@@ -85,7 +85,10 @@ def replay(task: Task, run_id: str) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="completeness-") as tmp:
         repo, out = Path(tmp) / "repo", Path(tmp) / "out"
         out.mkdir()
-        _git(None, "clone", "--quiet", "-c", "core.autocrlf=false", "--shared", "--no-checkout", str(task.checkout), str(repo))
+        # A full local clone (hard-linked, so still cheap), not --shared: a shared clone points at
+        # the source's objects by a Windows path that doesn't exist inside the container, so git is
+        # broken there, and builds that read the version from git (copier) fail to install.
+        _git(None, "clone", "--quiet", "-c", "core.autocrlf=false", "--no-checkout", str(task.checkout), str(repo))
         _git(repo, "checkout", "--quiet", task.commit)
         if diff.strip():
             apply_patch(repo, diff, Path(tmp) / "run.patch")

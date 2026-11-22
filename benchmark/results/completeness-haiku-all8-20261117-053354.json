@@ -1,0 +1,639 @@
+{
+ "20261117-053402-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 134,
+   "passed": 134,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-053731-fastapi-restful": {
+  "task": "fastapi-restful",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 69,
+   "passed": 69,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-054018-pydantic-cli": {
+  "task": "pydantic-cli",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 35,
+   "passed": 35,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 10,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [
+    {
+     "location": "pydantic_cli/examples/simple_with_boolean_and_config.py:13",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_schema.py:15",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_boolean_custom.py:19",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_custom.py:14",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_custom_and_setup_log.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_json_config_not_found.py:11",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_shell_autocomplete_support.py:18",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/subparser.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/subparser.py:36",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_json_config.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    }
+   ],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-054508-pyonwater": {
+  "task": "pyonwater",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 25,
+   "passed": 25,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-054719-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 30,
+   "passed": 30,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-055136-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 31,
+   "passed": 31,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-074551-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 134,
+   "passed": 134,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-074845-fastapi-restful": {
+  "task": "fastapi-restful",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 69,
+   "passed": 69,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-065331-gto": {
+  "task": "gto",
+  "repeat": 1,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 141,
+   "passed": 141,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-075127-pydantic-cli": {
+  "task": "pydantic-cli",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 35,
+   "passed": 35,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 10,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [
+    {
+     "location": "pydantic_cli/examples/simple_with_boolean_and_config.py:13",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_schema.py:15",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_boolean_custom.py:19",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_custom.py:14",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_custom_and_setup_log.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_json_config_not_found.py:11",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_shell_autocomplete_support.py:18",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/subparser.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/subparser.py:36",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_json_config.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    }
+   ],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-075616-pyonwater": {
+  "task": "pyonwater",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 25,
+   "passed": 25,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-075826-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 30,
+   "passed": 30,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-080229-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 31,
+   "passed": 31,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-091813-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 134,
+   "passed": 134,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-092107-fastapi-restful": {
+  "task": "fastapi-restful",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 69,
+   "passed": 69,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-080723-gto": {
+  "task": "gto",
+  "repeat": 2,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 141,
+   "passed": 141,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-092353-pydantic-cli": {
+  "task": "pydantic-cli",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 35,
+   "passed": 35,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 10,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [
+    {
+     "location": "pydantic_cli/examples/simple_with_boolean_and_config.py:13",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_schema.py:15",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_boolean_custom.py:19",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_custom.py:14",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_custom_and_setup_log.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_json_config_not_found.py:11",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_shell_autocomplete_support.py:18",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/subparser.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/subparser.py:36",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    },
+    {
+     "location": "pydantic_cli/examples/simple_with_json_config.py:27",
+     "category": "PydanticDeprecatedSince20",
+     "message": "Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration"
+    }
+   ],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-092846-pyonwater": {
+  "task": "pyonwater",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 25,
+   "passed": 25,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-093114-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 30,
+   "passed": 30,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-093442-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 31,
+   "passed": 31,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-094851-copier": {
+  "task": "copier",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 696,
+   "passed": 691,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 5
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261117-093853-gto": {
+  "task": "gto",
+  "repeat": 3,
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 141,
+   "passed": 141,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ }
+}
