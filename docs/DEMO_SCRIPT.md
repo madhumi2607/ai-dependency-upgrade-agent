@@ -73,8 +73,8 @@ README results tables.
 
 **Say:** "Across twelve projects and two libraries, the agent completed thirty-four of thirty-five
 migrations, at about three cents a run. I also rebuilt it in LangGraph and benchmarked both:
-identical results, twice the code. Everything, from the benchmark tasks to every run's trace, is in
-the repo."
+identical results, twice the code. The benchmark tasks and every results file are in the repo, so
+anyone can rerun the experiments."
 
 ---
 

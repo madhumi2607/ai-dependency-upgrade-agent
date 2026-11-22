@@ -127,5 +127,5 @@ On these tasks, Haiku succeeded about as reliably as Opus at 20–50× lower cos
 - Harder SQLAlchemy tasks: the current four are Core-heavy and SQLite-only; none exercises the
   2.0-style typed ORM.
 
-The code, the benchmark tasks and every result file are in the repository, so each number here can
-be traced back to a recorded run.
+The code, the benchmark tasks (repo, pinned commit, install and test commands) and every results
+file are in the repository, so each experiment can be rerun.
