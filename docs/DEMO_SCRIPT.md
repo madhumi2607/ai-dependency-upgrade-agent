@@ -1,5 +1,9 @@
 # Demo video script (about 3 minutes)
 
+A captioned version is already recorded automatically: [demo/demo.mp4](demo/demo.mp4), made by
+[demo/record_demo.py](demo/record_demo.py) (a real Haiku run on agate-sql, watched live in the
+dashboard by a headless browser). This script is for a narrated version with the terminal parts.
+
 Record at 1080p with a large terminal font (18pt+). Use a quick task so the live part fits:
 **agate-sql** (SQLAlchemy, ~13 steps, ~3 minutes, ~$0.01) or **pyonwater** (Pydantic, ~10 steps).
 Do one full rehearsal first so Docker images and the pip cache are warm; the recorded run is then fast.

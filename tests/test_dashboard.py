@@ -105,3 +105,13 @@ def test_unknown_api_paths_are_404_not_the_app(runs: Path) -> None:
     for path in ("/api/nope", "/api/runs/..%2F..%2F.env"):
         response = client.get(path)
         assert response.status_code == 404 and response.headers["content-type"] == "application/json"
+
+
+def test_a_run_that_stopped_writing_is_interrupted_not_running(runs: Path) -> None:
+    import os
+    import time
+    live = runs / "20261019-110000-geojson-pydantic"
+    assert summarize(live)["status"] == "running"
+    old = time.time() - 2 * 3600  # killed two hours ago: no result.json, no new events
+    os.utime(live / "events.jsonl", (old, old))
+    assert summarize(live)["status"] == "interrupted"

@@ -109,6 +109,7 @@ code { background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-
 .badge-succeeded { background: var(--good-wash); color: var(--good-text); border-color: rgba(12, 163, 12, 0.35); }
 .badge-failed { background: var(--critical-wash); color: var(--critical-text); border-color: rgba(208, 59, 59, 0.4); }
 .badge-running { background: var(--run-wash); color: var(--run-text); border-color: rgba(57, 135, 229, 0.4); }
+.badge-interrupted { background: var(--surface-2); color: var(--muted); border-color: var(--border-strong); }
 .pulse { animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }

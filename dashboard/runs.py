@@ -6,11 +6,17 @@ computed from events.jsonl rather than result.json, so a run that is still in pr
 """
 
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from agent.pricing import estimate_cost
+
+# A run with no result.json whose trace hasn't changed for this long was killed (the machine slept,
+# the process crashed): it will never finish, so it isn't shown as running. Longer than the slowest
+# single step (a copier test run is ~25 minutes).
+STALE_AFTER_SECONDS = 45 * 60
 
 
 def list_run_ids(runs_dir: Path) -> list[str]:
@@ -63,7 +69,9 @@ def summarize(run_dir: Path) -> dict[str, Any]:
     tokens = {key: sum(e.get(key, 0) for e in llm_calls) for key in ("input_tokens", "cache_read_tokens", "output_tokens")}
 
     if result is None:
-        status = "running"
+        events_file = run_dir / "events.jsonl"
+        last_write = events_file.stat().st_mtime if events_file.exists() else 0
+        status = "interrupted" if time.time() - last_write > STALE_AFTER_SECONDS else "running"
     else:
         status = "succeeded" if result.get("success") else "failed"
     finished_at = result.get("finished_at") if result else None

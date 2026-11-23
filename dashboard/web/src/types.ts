@@ -14,7 +14,7 @@ export type RunSummary = {
   effort: string | null;
   impl: "loop" | "langgraph";
   library: string | null;
-  status: "running" | "succeeded" | "failed";
+  status: "running" | "succeeded" | "failed" | "interrupted"; // interrupted: killed, never finished
   stop_reason: string | null;
   error: string | null;
   summary: string | null;

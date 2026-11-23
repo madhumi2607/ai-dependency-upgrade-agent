@@ -13,7 +13,10 @@ function median(values: number[]): number | null {
 }
 
 function Headline({ runs }: { runs: RunSummary[] }) {
-  const finished = runs.filter((r) => r.status !== "running");
+  // Interrupted runs (killed by sleep or a crash) say nothing about the agent: left out, like the
+  // benchmark runner's infrastructure failures.
+  const finished = runs.filter((r) => r.status === "succeeded" || r.status === "failed");
+  const interrupted = runs.filter((r) => r.status === "interrupted").length;
   const succeeded = finished.filter((r) => r.status === "succeeded");
   const costs = finished.map((r) => r.cost_usd).filter((c): c is number => c !== null);
   const medianSteps = median(succeeded.map((r) => r.steps));
@@ -37,7 +40,7 @@ function Headline({ runs }: { runs: RunSummary[] }) {
       <div className="stat">
         <div className="stat-label">Runs</div>
         <div className="stat-value">{runs.length}</div>
-        <div className="muted small">{runs.length - finished.length} in progress</div>
+        <div className="muted small">{runs.length - finished.length - interrupted} in progress{interrupted ? ` · ${interrupted} interrupted` : ""}</div>
       </div>
     </div>
   );
