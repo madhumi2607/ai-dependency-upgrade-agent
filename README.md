@@ -19,7 +19,7 @@ library but left v1 config in its example modules (see "What the success rate do
 | Models | Claude (default), Gemini, Groq behind one small interface |
 | Verification | the project's own tests in Docker, plus automatic review checks on the final diff |
 | Observability | every model and tool call recorded; React dashboard with per-run charts |
-| Demo | [docs/demo/demo.mp4](docs/demo/demo.mp4): a real run watched live in the dashboard (2:40, captioned, recorded automatically by `docs/demo/record_demo.py`) |
+| Demo | [docs/demo/demo.mp4](docs/demo/demo.mp4): a real run watched live in the dashboard (3:13, narrated and captioned; recorded automatically by `docs/demo/record_demo.py`, voiceover added by `docs/demo/narrate.py`) |
 
 ---
 

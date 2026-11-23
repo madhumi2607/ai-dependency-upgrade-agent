@@ -1,8 +1,10 @@
 # Demo video script (about 3 minutes)
 
-A captioned version is already recorded automatically: [demo/demo.mp4](demo/demo.mp4), made by
-[demo/record_demo.py](demo/record_demo.py) (a real Haiku run on agate-sql, watched live in the
-dashboard by a headless browser). This script is for a narrated version with the terminal parts.
+A narrated version is already made: [demo/demo.mp4](demo/demo.mp4). [demo/record_demo.py](demo/record_demo.py)
+records a real Haiku run on agate-sql, watched live in the dashboard by a headless browser, with
+captions (`demo-silent.mp4`) and scene timings (`scenes.json`); [demo/narrate.py](demo/narrate.py)
+mixes in an ElevenLabs voiceover (`voice/`, script in `narration.json`) at those timings. This script
+is for recording your own narrated version, including the terminal parts.
 
 Record at 1080p with a large terminal font (18pt+). Use a quick task so the live part fits:
 **agate-sql** (SQLAlchemy, ~13 steps, ~3 minutes, ~$0.01) or **pyonwater** (Pydantic, ~10 steps).
