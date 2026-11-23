@@ -113,6 +113,14 @@ silently stripped carriage returns, so patches for CRLF files no longer applied)
 version *changed the result it measured*: forcing warnings on with `-W` flipped one project's test.
 A measurement has to run exactly what was graded.
 
+The other gap: the agent is graded by tests it can see. For 10 projects, upstream later ported
+the code itself and changed some tests along the way, so I swapped those post-port tests into each
+run and ran them, with upstream's own port as a control. 36 of 57 runs pass every one. I read every
+remaining failure, and each traces to something upstream changed *beyond* the migration: a feature
+added in the same PR, a new attribute, a redesigned command line, a different error type. None was
+a migration mistake, and the scores were identical across every run of a task, which is what
+deliberate upstream choices look like.
+
 ## 8. Hand-written loop vs LangGraph
 
 I rebuilt the agent as a LangGraph `StateGraph`, holding the model client, tools, prompts and
@@ -143,8 +151,6 @@ On these tasks, Haiku succeeded about as reliably as Opus at 20–50× lower cos
 
 ## What I'd do next
 
-- Grade against held-out tests: where upstream ported a project itself, run upstream's
-  post-migration tests against the agent's code.
 - Grow the benchmark from 18 projects toward 30–50; every number above has wide error bars.
 - Use LangGraph's checkpointing to resume a run after a crash, now that the graph version exists.
 - Harder SQLAlchemy tasks: the current five are mostly Core and SQLite-only; none exercises the

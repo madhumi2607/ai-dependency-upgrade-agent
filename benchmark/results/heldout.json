@@ -1,0 +1,1134 @@
+{
+ "control:geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 136,
+   "passed": 136,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "control:fastapi-restful": {
+  "task": "fastapi-restful",
+  "impl": "upstream",
+  "status": "startup_error",
+  "counts": null,
+  "failures": [
+   {
+    "tests": [
+     "tests/conftest.py"
+    ],
+    "count": 1,
+    "error": "ModuleNotFoundError: No module named 'typing_inspect'",
+    "location": "fastapi_restful/cbv.py:11"
+   }
+  ]
+ },
+ "control:pydantic-cli": {
+  "task": "pydantic-cli",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 12,
+   "passed": 12,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "control:pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "impl": "upstream",
+  "status": "failed",
+  "counts": {
+   "total": 18,
+   "passed": 17,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_nested.py::test_nested_BaseModels_in_Typing_List"
+    ],
+    "count": 1,
+    "error": "pydantic_core._pydantic_core.ValidationError: 2 validation errors for FooList",
+    "location": "pydantic_sqlite/_core.py:237"
+   }
+  ]
+ },
+ "control:dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 29,
+   "passed": 29,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "control:copier": {
+  "task": "copier",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 28,
+   "passed": 28,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "control:dataset": {
+  "task": "dataset",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 59,
+   "passed": 59,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "control:sqladmin": {
+  "task": "sqladmin",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 6,
+   "passed": 6,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "control:confz": {
+  "task": "confz",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 8,
+   "passed": 8,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "control:morecantile": {
+  "task": "morecantile",
+  "impl": "upstream",
+  "status": "passed",
+  "counts": {
+   "total": 74,
+   "passed": 74,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-053402-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 136,
+   "passed": 135,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_geometries.py::test_parse_geometry_obj_geometry_collection"
+    ],
+    "count": 1,
+    "error": "pydantic_core._pydantic_core.ValidationError: 1 validation error for Geometry",
+    "location": "geojson_pydantic/geometries.py:346"
+   }
+  ]
+ },
+ "20261117-053731-fastapi-restful": {
+  "task": "fastapi-restful",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 2,
+   "passed": 2,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-054018-pydantic-cli": {
+  "task": "pydantic-cli",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 12,
+   "passed": 4,
+   "failed": 8,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_02",
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_03",
+     "pydantic_cli/tests/test_examples_simple_schema.py::TestExamples::test_01"
+    ],
+    "count": 8,
+    "error": "AssertionError: 2 != 0",
+    "location": "pydantic_cli/tests/__init__.py:47"
+   }
+  ]
+ },
+ "20261117-054719-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-055136-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 29,
+   "passed": 29,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-074551-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 136,
+   "passed": 135,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_geometries.py::test_parse_geometry_obj_geometry_collection"
+    ],
+    "count": 1,
+    "error": "pydantic_core._pydantic_core.ValidationError: 1 validation error for Geometry",
+    "location": "geojson_pydantic/geometries.py:345"
+   }
+  ]
+ },
+ "20261117-074845-fastapi-restful": {
+  "task": "fastapi-restful",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 2,
+   "passed": 2,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-075127-pydantic-cli": {
+  "task": "pydantic-cli",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 12,
+   "passed": 4,
+   "failed": 8,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_02",
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_03",
+     "pydantic_cli/tests/test_examples_simple_schema.py::TestExamples::test_01"
+    ],
+    "count": 8,
+    "error": "AssertionError: 2 != 0",
+    "location": "pydantic_cli/tests/__init__.py:47"
+   }
+  ]
+ },
+ "20261117-075826-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-080229-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 29,
+   "passed": 29,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-091813-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 136,
+   "passed": 135,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_geometries.py::test_parse_geometry_obj_geometry_collection"
+    ],
+    "count": 1,
+    "error": "pydantic_core._pydantic_core.ValidationError: 1 validation error for _GeometryBase",
+    "location": "geojson_pydantic/geometries.py:335"
+   }
+  ]
+ },
+ "20261117-092107-fastapi-restful": {
+  "task": "fastapi-restful",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 2,
+   "passed": 2,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-092353-pydantic-cli": {
+  "task": "pydantic-cli",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 12,
+   "passed": 4,
+   "failed": 8,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_02",
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_03",
+     "pydantic_cli/tests/test_examples_simple_schema.py::TestExamples::test_01"
+    ],
+    "count": 8,
+    "error": "AssertionError: 2 != 0",
+    "location": "pydantic_cli/tests/__init__.py:47"
+   }
+  ]
+ },
+ "20261117-093114-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-093442-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 29,
+   "passed": 29,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261117-094851-copier": {
+  "task": "copier",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 28,
+   "passed": 27,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_config.py::test_flags_extra_fails"
+    ],
+    "count": 1,
+    "error": "TypeError: Worker.__init__() got an unexpected keyword argument 'i_am_not_a_member'",
+    "location": "tests/test_config.py:222"
+   }
+  ]
+ },
+ "20261118-144015-dataset": {
+  "task": "dataset",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 59,
+   "passed": 57,
+   "failed": 2,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "test/test_database.py::test_create_table_no_ids"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:36"
+   },
+   {
+    "tests": [
+     "test/test_database.py::test_invalid_values"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:121"
+   }
+  ]
+ },
+ "20261118-144741-dataset": {
+  "task": "dataset",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 59,
+   "passed": 57,
+   "failed": 2,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "test/test_database.py::test_create_table_no_ids"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:36"
+   },
+   {
+    "tests": [
+     "test/test_database.py::test_invalid_values"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:121"
+   }
+  ]
+ },
+ "20261118-145154-dataset": {
+  "task": "dataset",
+  "impl": "loop",
+  "status": "failed",
+  "counts": {
+   "total": 59,
+   "passed": 57,
+   "failed": 2,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "test/test_database.py::test_create_table_no_ids"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:36"
+   },
+   {
+    "tests": [
+     "test/test_database.py::test_invalid_values"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:121"
+   }
+  ]
+ },
+ "20261122-091109-confz": {
+  "task": "confz",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 8,
+   "passed": 8,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-153332-morecantile": {
+  "task": "morecantile",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 74,
+   "passed": 74,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-132419-sqladmin": {
+  "task": "sqladmin",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 6,
+   "passed": 6,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-132843-confz": {
+  "task": "confz",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 8,
+   "passed": 8,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-133710-morecantile": {
+  "task": "morecantile",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 74,
+   "passed": 74,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-135819-sqladmin": {
+  "task": "sqladmin",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 6,
+   "passed": 6,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-140343-confz": {
+  "task": "confz",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 8,
+   "passed": 8,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-141345-morecantile": {
+  "task": "morecantile",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 74,
+   "passed": 74,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-145648-sqladmin": {
+  "task": "sqladmin",
+  "impl": "loop",
+  "status": "passed",
+  "counts": {
+   "total": 6,
+   "passed": 6,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261118-153154-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 136,
+   "passed": 135,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_geometries.py::test_parse_geometry_obj_geometry_collection"
+    ],
+    "count": 1,
+    "error": "pydantic_core._pydantic_core.ValidationError: 1 validation error for _GeometryBase",
+    "location": "geojson_pydantic/geometries.py:346"
+   }
+  ]
+ },
+ "20261118-153522-fastapi-restful": {
+  "task": "fastapi-restful",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 2,
+   "passed": 2,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261118-153905-pydantic-cli": {
+  "task": "pydantic-cli",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 12,
+   "passed": 4,
+   "failed": 8,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_02",
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_03",
+     "pydantic_cli/tests/test_examples_simple_schema.py::TestExamples::test_01"
+    ],
+    "count": 8,
+    "error": "AssertionError: 2 != 0",
+    "location": "pydantic_cli/tests/__init__.py:47"
+   }
+  ]
+ },
+ "20261118-154738-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261118-155202-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 29,
+   "passed": 29,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261119-093714-copier": {
+  "task": "copier",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 28,
+   "passed": 27,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_config.py::test_flags_extra_fails"
+    ],
+    "count": 1,
+    "error": "TypeError: Worker.__init__() got unexpected keyword argument(s): i_am_not_a_member",
+    "location": "copier/main.py:90"
+   }
+  ]
+ },
+ "20261119-100607-dataset": {
+  "task": "dataset",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 59,
+   "passed": 57,
+   "failed": 2,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "test/test_database.py::test_create_table_no_ids"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:36"
+   },
+   {
+    "tests": [
+     "test/test_database.py::test_invalid_values"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:121"
+   }
+  ]
+ },
+ "20261119-102118-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 136,
+   "passed": 135,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_geometries.py::test_parse_geometry_obj_geometry_collection"
+    ],
+    "count": 1,
+    "error": "pydantic_core._pydantic_core.ValidationError: 1 validation error for _GeometryBase",
+    "location": "geojson_pydantic/geometries.py:350"
+   }
+  ]
+ },
+ "20261119-102434-fastapi-restful": {
+  "task": "fastapi-restful",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 2,
+   "passed": 2,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261119-102842-pydantic-cli": {
+  "task": "pydantic-cli",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 12,
+   "passed": 4,
+   "failed": 8,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_02",
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_03",
+     "pydantic_cli/tests/test_examples_simple_schema.py::TestExamples::test_01"
+    ],
+    "count": 8,
+    "error": "AssertionError: 2 != 0",
+    "location": "pydantic_cli/tests/__init__.py:47"
+   }
+  ]
+ },
+ "20261119-103520-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261119-103946-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 29,
+   "passed": 29,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261121-183515-dataset": {
+  "task": "dataset",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 59,
+   "passed": 57,
+   "failed": 2,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "test/test_database.py::test_create_table_no_ids"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:36"
+   },
+   {
+    "tests": [
+     "test/test_database.py::test_invalid_values"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:121"
+   }
+  ]
+ },
+ "20261121-093400-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 136,
+   "passed": 135,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_geometries.py::test_parse_geometry_obj_geometry_collection"
+    ],
+    "count": 1,
+    "error": "pydantic_core._pydantic_core.ValidationError: 1 validation error for _GeometryBase",
+    "location": "geojson_pydantic/geometries.py:349"
+   }
+  ]
+ },
+ "20261121-093657-fastapi-restful": {
+  "task": "fastapi-restful",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 2,
+   "passed": 2,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261121-093938-pydantic-cli": {
+  "task": "pydantic-cli",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 12,
+   "passed": 4,
+   "failed": 8,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_02",
+     "pydantic_cli/tests/test_examples_simple_boolean_and_config.py::TestExamples::test_simple_03",
+     "pydantic_cli/tests/test_examples_simple_schema.py::TestExamples::test_01"
+    ],
+    "count": 8,
+    "error": "AssertionError: 2 != 0",
+    "location": "pydantic_cli/tests/__init__.py:47"
+   }
+  ]
+ },
+ "20261121-094648-pydantic-sqlite": {
+  "task": "pydantic-sqlite",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 18,
+   "passed": 18,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261121-095159-dbt-cloud-cli": {
+  "task": "dbt-cloud-cli",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 29,
+   "passed": 29,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-045256-copier": {
+  "task": "copier",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 28,
+   "passed": 27,
+   "failed": 1,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "tests/test_config.py::test_flags_extra_fails"
+    ],
+    "count": 1,
+    "error": "TypeError: Worker() got unexpected keyword argument(s): i_am_not_a_member",
+    "location": "copier/main.py:215"
+   }
+  ]
+ },
+ "20261122-052746-dataset": {
+  "task": "dataset",
+  "impl": "langgraph",
+  "status": "failed",
+  "counts": {
+   "total": 59,
+   "passed": 57,
+   "failed": 2,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": [
+   {
+    "tests": [
+     "test/test_database.py::test_create_table_no_ids"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:36"
+   },
+   {
+    "tests": [
+     "test/test_database.py::test_invalid_values"
+    ],
+    "count": 1,
+    "error": "AttributeError: 'Database' object has no attribute 'is_mysql'",
+    "location": "test/test_database.py:121"
+   }
+  ]
+ },
+ "20261122-155348-confz": {
+  "task": "confz",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 8,
+   "passed": 8,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-160256-morecantile": {
+  "task": "morecantile",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 74,
+   "passed": 74,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-162134-sqladmin": {
+  "task": "sqladmin",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 6,
+   "passed": 6,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-162704-confz": {
+  "task": "confz",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 8,
+   "passed": 8,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-163656-morecantile": {
+  "task": "morecantile",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 74,
+   "passed": 74,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-170131-sqladmin": {
+  "task": "sqladmin",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 6,
+   "passed": 6,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-170800-confz": {
+  "task": "confz",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 8,
+   "passed": 8,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261122-171704-morecantile": {
+  "task": "morecantile",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 74,
+   "passed": 74,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ },
+ "20261123-040459-sqladmin": {
+  "task": "sqladmin",
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 6,
+   "passed": 6,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "failures": []
+ }
+}

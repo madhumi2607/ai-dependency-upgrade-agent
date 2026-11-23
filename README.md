@@ -126,7 +126,8 @@ the migrated code no longer works on 1.4.
 
 "Succeeded" means the project's own full test suite passes on the new version, with no test
 edited or skipped (enforced by the tools, then checked on the diff). That is necessary for a
-correct migration but not sufficient, so three more things were measured or stated:
+correct migration but not sufficient, so three more things were measured or stated: completeness,
+task selection, and held-out tests.
 
 **Migration completeness.** Pydantic v2 still *runs* most v1-style code (`.dict()`, `@validator`,
 `class Config`) and only warns, so tests can pass on a half-done migration. `benchmark/completeness.py`
@@ -157,9 +158,40 @@ because the agent may not edit tests. That's a deliberate rule, but it means pro
 suites are tied to the old version aren't represented. Several candidates were rejected for exactly
 that (listed with reasons in `benchmark/tasks.yaml`).
 
-**No held-out tests.** The agent is graded by the same suite it can run. Completeness and the
-review checks are the independent signals; grading against upstream's own post-migration tests
-(where upstream ported) is the next step.
+**Held-out tests.** The agent is graded by the suite it can run, so its runs were also checked
+against tests it never saw. For 10 tasks, upstream later ported the project itself, directly on top
+of the pinned commit, and changed some tests while doing so. `benchmark/heldout.py` takes each
+successful run's code, swaps in upstream's post-port versions of exactly those test files, and runs
+them. As a control, upstream's own port runs against the same tests in the same sandbox.
+
+| Task | Runs | Held-out score (every run) | Upstream's port (control) |
+|---|---|---|---|
+| ConfZ | 6 | 8/8 | 8/8 |
+| morecantile | 6 | 74/74 | 74/74 |
+| sqladmin | 6 | 6/6 | 6/6 |
+| dbt-cloud-cli | 6 | 29/29 | 29/29 |
+| pydantic-sqlite | 6 | 18/18 | 17/18 (fails one on today's pydantic) |
+| FastApi-RESTful | 6 | 2/2 | can't install standalone (undeclared `typing_inspect`) |
+| geojson-pydantic | 6 | 135/136 | 136/136 |
+| dataset | 6 | 57/59 | 59/59 |
+| copier | 3 | 27/28 | 28/28 |
+| pydantic-cli | 6 | 4/12 | 12/12 |
+
+36 of 57 runs pass every held-out test. Every remaining failure was read, and each one traces to a
+change upstream made *beyond* the migration, which the agent had no way to know about:
+
+- **geojson-pydantic:** a new test for GeometryCollection support in `parse_geometry_obj`, a feature
+  upstream added in the same PR (the pinned code never had it).
+- **dataset:** new tests call `Database.is_mysql`, an attribute upstream added while restructuring.
+- **copier:** upstream changed a test to expect `ValidationError` where v1 raised `TypeError`; the
+  agent kept the v1 behaviour (see the copier note above).
+- **pydantic-cli:** upstream redesigned the command line in its port (`--no-run_training` became
+  `--run-training false`, plus new short flags); the agent kept the existing CLI.
+
+So no run failed a held-out test for a migration reason. Scores are identical across all runs of a
+task, in both agents, which is what deliberate upstream choices (rather than agent noise) look like.
+Not covered: pyonwater, agate-sql and rdflib-sqlalchemy (their ports changed no tests, so nothing is
+held out), gto (its port is 57 unrelated commits after the pin), and the 4 tasks never ported upstream.
 
 Full traces for every run in these tables are in `benchmark/traces/` (scrubbed of local paths and
 emails); unpack into `runs/` to inspect them in the dashboard.
