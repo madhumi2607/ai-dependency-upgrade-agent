@@ -97,14 +97,15 @@ def result_row(task: Task, model: str, docs: bool, run_dir: Path) -> dict[str, A
 
 
 # Agent implementations an experiment can run: the hand-written loop or the LangGraph graph.
-IMPLS = {"loop": "agent.loop", "langgraph": "agent_langgraph.run"}
+IMPLS = {"loop": ["agent.loop"], "langgraph": ["agent_langgraph.run"],
+         "multi": ["agent_langgraph.run", "--review"]}  # multi: migrator + reviewer agent
 
 
 def run_one(task: Task, model: str, docs: bool, max_steps: int, impl: str = "loop") -> tuple[Path | None, str | None]:
     """One agent run in a subprocess. Returns (its runs/<id> directory or None if it never
     started, the error text if it never started or didn't finish)."""
     reset_checkout(task)
-    cmd = [sys.executable, "-m", IMPLS[impl], "--task", task.id, "--max-steps", str(max_steps)]
+    cmd = [sys.executable, "-m", *IMPLS[impl], "--task", task.id, "--max-steps", str(max_steps)]
     if not docs:
         cmd.append("--no-docs")
     env = {**os.environ, "LLM_PROVIDER": "claude", "AGENT_CLAUDE_MODEL": model}

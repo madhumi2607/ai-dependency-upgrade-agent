@@ -12,7 +12,7 @@ export type RunSummary = {
   provider: string | null;
   model: string | null;
   effort: string | null;
-  impl: "loop" | "langgraph";
+  impl: "loop" | "langgraph" | "langgraph-review";
   library: string | null;
   status: "running" | "succeeded" | "failed" | "interrupted"; // interrupted: killed, never finished
   stop_reason: string | null;
@@ -53,7 +53,7 @@ export type TestReport = {
 export type ToolCallRef = { id: string; name: string; arguments: Record<string, unknown>; error: string | null };
 
 // One line of events.jsonl (agent/loop.py run_agent).
-export type RunEvent =
+export type RunEvent = (
   | { type: "start"; ts: number; system: string; tools: { name: string }[]; config: Record<string, unknown> }
   | { type: "test_run"; ts: number; purpose: "baseline" | "verification" | "final"; report: TestReport }
   | { type: "user_message"; ts: number; step: number; content: string }
@@ -65,7 +65,9 @@ export type RunEvent =
       type: "tool_call"; ts: number; step: number; id: string; name: string; arguments: Record<string, unknown>;
       result: string; is_error: boolean; seconds: number;
     }
-  | { type: "llm_error"; ts: number; step: number; error: string };
+  | { type: "llm_error"; ts: number; step: number; error: string }
+  | { type: "review"; ts: number; round: number; approve: boolean; findings: string[]; note?: string }
+) & { agent?: "reviewer"; round?: number }; // agent: set on the reviewer agent's events (multi-agent mode)
 
 export type RunDetail = {
   meta: Record<string, unknown>;

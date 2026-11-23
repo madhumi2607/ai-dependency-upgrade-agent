@@ -36,8 +36,14 @@ def config_from_env() -> SandboxConfig:
     )
 
 
-def build_server(config: SandboxConfig) -> MCPServer:
-    """Create the server for one task. Separate from main() so tests can inject a config."""
+MAX_SITES = 25  # deprecated call sites returned by find_deprecations (keep the reviewer's context small)
+
+
+def build_server(config: SandboxConfig, review_tools: bool = False) -> MCPServer:
+    """Create the server for one task. Separate from main() so tests can inject a config.
+
+    review_tools adds find_deprecations, for the reviewer agent only (SANDBOX_REVIEW_TOOLS=1): the
+    single-agent baselines must see exactly the tools they were benchmarked with."""
     server = MCPServer(
         "sandbox",
         instructions="Runs the target repo's test suite in an isolated Docker container with the upgraded dependency.",
@@ -53,11 +59,30 @@ def build_server(config: SandboxConfig) -> MCPServer:
         """
         return runner.run_tests(config, tests)
 
+    if review_tools:
+        @server.tool()
+        def find_deprecations() -> dict[str, Any]:
+            """Run the full test suite and list where the code still uses deprecated API of the upgraded
+            library: the deprecation warnings the suite triggers, by file:line in the repo's own source
+            (test files excluded). Old-style code that still runs on the new version shows up here even
+            though every test passes. Also lists deprecations the library reports from inside itself
+            (their message names the old API). Takes as long as a full test run.
+            """
+            report = runner.run_tests(config, None, deprecations=True)
+            found = report.get("deprecations") or {}
+            sites = found.get("library", [])
+            return {
+                "status": report.get("status"), "counts": report.get("counts"),
+                "deprecated_call_sites": [{"location": s["location"], "message": s["message"]} for s in sites[:MAX_SITES]],
+                "more_call_sites": max(len(sites) - MAX_SITES, 0),
+                "reported_inside_library": [s["message"] for s in found.get("library_internal", [])][:10],
+            }
+
     return server
 
 
 def main() -> None:
-    build_server(config_from_env()).run()
+    build_server(config_from_env(), review_tools=os.environ.get("SANDBOX_REVIEW_TOOLS") == "1").run()
 
 
 if __name__ == "__main__":

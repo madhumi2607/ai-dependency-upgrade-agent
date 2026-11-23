@@ -172,6 +172,28 @@ def test_server_over_mcp(tmp_path: Path) -> None:
     asyncio.run(scenario())
 
 
+def test_find_deprecations_is_only_for_the_reviewer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Baselines must keep their exact tool list; the reviewer gets a compact, capped list of sites."""
+    config = SandboxConfig(repo_root=tmp_path, install_cmd="x", test_cmd="pytest", upgrade="pydantic>=2,<3")
+    sites = [{"location": f"pkg/m.py:{i}", "category": "PydanticDeprecatedSince20", "message": "class-based config"}
+             for i in range(30)]
+    monkeypatch.setattr(runner, "run_tests", lambda cfg, tests, deprecations=False: {
+        "status": "passed", "counts": {"total": 3, "passed": 3},
+        "deprecations": {"library": sites, "other": [], "library_internal": [{"message": "`parse_obj` is deprecated"}]}})
+
+    async def scenario() -> None:
+        async with Client(build_server(config)) as client:
+            assert [t.name for t in (await client.list_tools()).tools] == ["run_tests"]
+        async with Client(build_server(config, review_tools=True)) as client:
+            assert sorted(t.name for t in (await client.list_tools()).tools) == ["find_deprecations", "run_tests"]
+            out = (await client.call_tool("find_deprecations", {})).structured_content
+            assert out["status"] == "passed" and len(out["deprecated_call_sites"]) == 25 and out["more_call_sites"] == 5
+            assert out["deprecated_call_sites"][0] == {"location": "pkg/m.py:0", "message": "class-based config"}
+            assert out["reported_inside_library"] == ["`parse_obj` is deprecated"]
+
+    asyncio.run(scenario())
+
+
 # --- end to end: real Docker, real target repo (opt-in) ---
 
 @pytest.mark.docker

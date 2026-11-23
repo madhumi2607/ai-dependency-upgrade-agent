@@ -74,7 +74,10 @@ function Segmented({ label, options, value, onChange }: { label: string; options
   );
 }
 
-const IMPLS: Option[] = [{ value: "all", label: "All" }, { value: "loop", label: "Hand-written" }, { value: "langgraph", label: "LangGraph" }];
+const IMPLS: Option[] = [
+  { value: "all", label: "All" }, { value: "loop", label: "Hand-written" }, { value: "langgraph", label: "LangGraph" },
+  { value: "langgraph-review", label: "LangGraph + reviewer" },
+];
 const LIBRARY_NAMES: Record<string, string> = { pydantic: "Pydantic", sqlalchemy: "SQLAlchemy" };
 
 export default function RunsPage() {
@@ -139,6 +142,7 @@ export default function RunsPage() {
                       <span className="mono small">{r.model}</span>
                       {r.effort && <div className="muted small">effort {r.effort}</div>}
                       {r.impl === "langgraph" && <span className="impl-tag">LangGraph</span>}
+                      {r.impl === "langgraph-review" && <span className="impl-tag">LangGraph + reviewer</span>}
                     </td>
                     <td><StatusBadge status={r.status} stopReason={r.stop_reason} /></td>
                     <td className="num mono">{formatTests(r.tests_before)} → {formatTests(r.tests_after)}</td>

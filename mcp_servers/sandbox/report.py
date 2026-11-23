@@ -237,3 +237,52 @@ def build_report(out_dir: Path, exit_code: int, upgrade_packages: list[str]) -> 
     if dropped:
         report["groups_not_shown"] = dropped
     return report
+
+
+# ---------- deprecation warnings (benchmark/completeness.py and the reviewer's find_deprecations) ----------
+
+# Test files are the agent's to leave alone, so deprecations reported there are not counted.
+_TEST_FILE = re.compile(r"(^|/)(tests?/|conftest\.py$|test_[^/]*\.py$|[^/]*_test\.py$)")
+# "  /work/pkg/models.py:12: PydanticDeprecatedSince20: Pydantic V1 style `@validator` ..."
+WARNING_LINE = re.compile(r"^\s+(?P<path>\S+?):(?P<line>\d+): (?P<category>[A-Za-z_][\w.]*): (?P<message>.*)$")
+
+
+def is_deprecation(category: str) -> bool:
+    return "Deprecat" in category or category.startswith(("MovedIn", "RemovedIn"))
+
+
+def from_library(category: str, message: str, library: str) -> bool:
+    """Is this warning about the library being migrated (vs. some other dependency)?"""
+    if library == "pydantic":
+        return category.startswith("Pydantic") or "pydantic" in message.lower()
+    if library == "sqlalchemy":
+        return category.startswith(("SA", "MovedIn", "RemovedIn")) or "sqlalchemy" in message.lower()
+    return library.lower() in message.lower()
+
+
+def parse_deprecations(pytest_log: str, library: str) -> dict[str, list[dict[str, str]]]:
+    """Deprecation warnings from pytest's warnings summary, by unique source location.
+
+    Returns {"library": [...], "other": [...], "library_internal": [...]}. "library" and "other" are
+    call sites in the repo's own (non-test) source. "library_internal" are deprecations of the migrated
+    library that it reports at a line inside itself (e.g. pydantic's class-based `Config` warning), so
+    they can't be attributed to a repo line; they're kept, deduplicated by message, rather than dropped.
+    """
+    section = pytest_log.split("warnings summary", 1)[1] if "warnings summary" in pytest_log else ""
+    section = re.split(r"^-- Docs:|^={5,}", section, maxsplit=1, flags=re.M)[0] if section else ""
+    found: dict[str, dict[str, dict[str, str]]] = {"library": {}, "other": {}, "library_internal": {}}
+    for line in section.splitlines():
+        m = WARNING_LINE.match(line)
+        if not m or not is_deprecation(m["category"]):
+            continue
+        path = m["path"].removeprefix("/work/")
+        if "site-packages" in path and f"/{library.lower()}/" in path.lower():
+            found["library_internal"][m["message"][:200]] = {"location": path.split("site-packages/")[-1] + f":{m['line']}",
+                                                             "category": m["category"], "message": m["message"][:200]}
+            continue
+        if path.startswith("/") or "site-packages" in path or path.startswith("<") or _TEST_FILE.search(path):
+            continue  # outside the repo, or in its tests (which the agent may not change)
+        kind = "library" if from_library(m["category"], m["message"], library) else "other"
+        found[kind][f"{path}:{m['line']}"] = {"location": f"{path}:{m['line']}", "category": m["category"],
+                                               "message": m["message"][:200]}
+    return {kind: list(sites.values()) for kind, sites in found.items()}

@@ -11,12 +11,13 @@ import json
 import os
 import sys
 from dataclasses import asdict
+from pathlib import Path
 
 from agent.checks import check_run
 from agent.llm import get_llm
 from agent.loop import PROJECT_ROOT, LoopConfig, TaskSpec, ToolBox, _stdio_server, docs_index_ready
 from agent.trace import RunTrace
-from agent_langgraph.graph import run_agent
+from agent_langgraph.graph import ReviewConfig, run_agent
 from benchmark.tasks import load_tasks, prepare_checkout
 
 
@@ -28,6 +29,8 @@ async def _main(args: argparse.Namespace) -> RunTrace:
         task = TaskSpec(benchmark_task.library, benchmark_task.old_version, benchmark_task.new_version)
     else:
         task = TaskSpec(args.library, args.old_version, args.new_version)
+    if args.review:
+        os.environ["SANDBOX_REVIEW_TOOLS"] = "1"  # adds find_deprecations; must precede starting the servers
     servers = [_stdio_server("mcp_servers.repo_tools.server"), _stdio_server("mcp_servers.sandbox.server")]
     use_docs = not args.no_docs and docs_index_ready()
     if use_docs:
@@ -36,7 +39,7 @@ async def _main(args: argparse.Namespace) -> RunTrace:
     llm = get_llm()
     trace = RunTrace.create(args.runs_dir, repo=os.environ["TARGET_REPO_ROOT"], meta={
         "task_id": args.task,
-        "impl": "langgraph",
+        "impl": "langgraph-review" if args.review else "langgraph",
         "docs_search": use_docs,
         "provider": os.environ.get("LLM_PROVIDER", "claude"),
         "model": llm.model,
@@ -45,7 +48,8 @@ async def _main(args: argparse.Namespace) -> RunTrace:
     })
     print(f"Recording run to {trace.path}", file=sys.stderr)  # benchmark/runner.py looks for this line
     async with ToolBox(servers) as toolbox:
-        result = await run_agent(llm, toolbox, task, LoopConfig(max_steps=args.max_steps), on_event=trace)
+        review = ReviewConfig(repo_root=Path(os.environ["TARGET_REPO_ROOT"])) if args.review else None
+        result = await run_agent(llm, toolbox, task, LoopConfig(max_steps=args.max_steps), on_event=trace, review=review)
     trace.finish(result)
     try:
         findings = check_run(trace.path)
@@ -64,6 +68,7 @@ def main() -> None:
     parser.add_argument("--new-version", default="2")
     parser.add_argument("--max-steps", type=int, default=LoopConfig.max_steps)
     parser.add_argument("--no-docs", action="store_true")
+    parser.add_argument("--review", action="store_true", help="add the reviewer agent (multi-agent mode)")
     parser.add_argument("--runs-dir", default=str(PROJECT_ROOT / "runs"))
     trace = asyncio.run(_main(parser.parse_args()))
     print(f"Trace: {trace.path}")

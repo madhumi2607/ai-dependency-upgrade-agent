@@ -12,7 +12,7 @@ from typing import Any
 
 from mcp.server.mcpserver.exceptions import ToolError
 
-from mcp_servers.sandbox.report import EXIT_INSTALL_FAILED, EXIT_UPGRADE_FAILED, build_report
+from mcp_servers.sandbox.report import EXIT_INSTALL_FAILED, EXIT_UPGRADE_FAILED, build_report, parse_deprecations
 
 # Exit codes that mean "the tests ran (or failed to install)": pytest's 0-5 plus the
 # entrypoint's 10/11. Anything else means the sandbox itself broke.
@@ -71,8 +71,11 @@ def build_docker_command(config: SandboxConfig, out_dir: Path, container_name: s
     ]
 
 
-def run_tests(config: SandboxConfig, tests: list[str] | None = None) -> dict[str, Any]:
-    """Install the repo, apply the upgrade and run pytest in a fresh container; return the summary."""
+def run_tests(config: SandboxConfig, tests: list[str] | None = None, deprecations: bool = False) -> dict[str, Any]:
+    """Install the repo, apply the upgrade and run pytest in a fresh container; return the summary.
+
+    deprecations=True also reads pytest's warnings summary and adds the deprecated call sites of the
+    upgraded library that the run hit (for the reviewer agent's find_deprecations tool)."""
     container_name = f"migration-sandbox-{uuid.uuid4().hex[:8]}"
     with tempfile.TemporaryDirectory(prefix="sandbox-out-") as tmp:
         out_dir = Path(tmp)
@@ -99,4 +102,9 @@ def run_tests(config: SandboxConfig, tests: list[str] | None = None) -> dict[str
 
         report = build_report(out_dir, proc.returncode, upgrade_packages(config.upgrade))
         report["duration_seconds"] = duration
+        if deprecations:
+            log_path = out_dir / "pytest.log"
+            log = log_path.read_text(encoding="utf-8", errors="replace") if log_path.exists() else ""
+            library = (upgrade_packages(config.upgrade) or [""])[0].lower()
+            report["deprecations"] = parse_deprecations(log, library)
         return report

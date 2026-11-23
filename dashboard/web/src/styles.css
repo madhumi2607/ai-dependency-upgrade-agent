@@ -254,3 +254,12 @@ details.is-error .tool-name { color: var(--critical-text); }
   display: inline-block; margin-top: 3px; padding: 0 6px; border: 1px solid var(--border-strong);
   border-radius: 4px; font-size: 0.72rem; color: var(--text-2);
 }
+
+/* ---------- reviewer agent (multi-agent runs) ---------- */
+.agent-tag {
+  display: inline-block; margin: 0 0 4px; padding: 0 6px; border-radius: 4px; font-size: 0.7rem;
+  color: var(--accent); border: 1px solid var(--accent);
+}
+.review-card ul { margin: 6px 0 0; padding-left: 18px; }
+.review-ok { border-color: rgba(12, 163, 12, 0.35); }
+.review-findings { border-color: rgba(208, 140, 59, 0.5); }

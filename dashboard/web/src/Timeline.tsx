@@ -7,7 +7,8 @@ export default function Timeline({ events }: { events: RunEvent[] }) {
   return (
     <ol className="timeline">
       {events.map((e, i) => (
-        <li key={i} className={`event event-${e.type}`}>
+        <li key={i} className={`event event-${e.type}${e.agent === "reviewer" ? " event-reviewer" : ""}`}>
+          {e.agent === "reviewer" && <span className="agent-tag">Reviewer</span>}
           <EventView event={e} />
         </li>
       ))}
@@ -27,6 +28,13 @@ function EventView({ event: e }: { event: RunEvent }) {
     case "test_run":
       return <TestRunView purpose={e.purpose} report={e.report} />;
     case "user_message":
+      if (e.agent === "reviewer")
+        return (
+          <details>
+            <summary><b>Review started</b> <span className="muted">· round {e.round} · a second agent checks the migration with a fresh context</span></summary>
+            <pre className="code">{e.content}</pre>
+          </details>
+        );
       return (
         <details>
           <summary>
@@ -65,6 +73,16 @@ function EventView({ event: e }: { event: RunEvent }) {
       );
     case "llm_error":
       return <div className="error prewrap"><b>Model API error</b> at step {e.step}: {e.error}</div>;
+    case "review":
+      return (
+        <div className={`card review-card ${e.approve ? "review-ok" : "review-findings"}`}>
+          <div className="event-title">
+            <b>Review {e.round}: {e.approve ? "approved" : `${e.findings.length} finding${e.findings.length === 1 ? "" : "s"} sent back to the migrator`}</b>
+            {e.note && <span className="muted small"> · {e.note}</span>}
+          </div>
+          {e.findings.length > 0 && <ul className="small">{e.findings.map((f, j) => <li key={j}>{f}</li>)}</ul>}
+        </div>
+      );
   }
 }
 
