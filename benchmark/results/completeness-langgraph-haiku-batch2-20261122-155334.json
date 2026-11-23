@@ -1,0 +1,452 @@
+{
+ "20261122-155348-confz": {
+  "task": "confz",
+  "repeat": 1,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 42,
+   "passed": 42,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-155735-withings-api": {
+  "task": "withings-api",
+  "repeat": 1,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 32,
+   "passed": 32,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-160051-netlist": {
+  "task": "netlist",
+  "repeat": 1,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 20,
+   "passed": 20,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-160256-morecantile": {
+  "task": "morecantile",
+  "repeat": 1,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 186,
+   "passed": 183,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 3
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-160710-basin3d": {
+  "task": "basin3d",
+  "repeat": 1,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 486,
+   "passed": 484,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 2
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 3,
+  "sites": {
+   "library": [],
+   "other": [
+    {
+     "location": "basin3d/core/catalog.py:224",
+     "category": "DeprecationWarning",
+     "message": "open_text is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    },
+    {
+     "location": "basin3d/core/catalog.py:288",
+     "category": "DeprecationWarning",
+     "message": "open_text is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    },
+    {
+     "location": "basin3d/core/catalog.py:104",
+     "category": "DeprecationWarning",
+     "message": "is_resource is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    }
+   ],
+   "library_internal": []
+  }
+ },
+ "20261122-162134-sqladmin": {
+  "task": "sqladmin",
+  "repeat": 1,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 142,
+   "passed": 140,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 2
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-162704-confz": {
+  "task": "confz",
+  "repeat": 2,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 42,
+   "passed": 42,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-163039-withings-api": {
+  "task": "withings-api",
+  "repeat": 2,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 32,
+   "passed": 32,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-163429-netlist": {
+  "task": "netlist",
+  "repeat": 2,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 20,
+   "passed": 20,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-163656-morecantile": {
+  "task": "morecantile",
+  "repeat": 2,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 186,
+   "passed": 183,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 3
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-164210-basin3d": {
+  "task": "basin3d",
+  "repeat": 2,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 486,
+   "passed": 484,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 2
+  },
+  "measurable": true,
+  "library_deprecations": 1,
+  "library_internal": 0,
+  "other_deprecations": 3,
+  "sites": {
+   "library": [
+    {
+     "location": "basin3d/core/translate.py:418",
+     "category": "PydanticDeprecatedSince20",
+     "message": "The `copy` method is deprecated; use `model_copy` instead. See the docstring of `BaseModel.copy` for details about how to handle `include` and `exclude`. Deprecated in Pydantic V2.0 to be removed in V"
+    }
+   ],
+   "other": [
+    {
+     "location": "basin3d/core/catalog.py:224",
+     "category": "DeprecationWarning",
+     "message": "open_text is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    },
+    {
+     "location": "basin3d/core/catalog.py:288",
+     "category": "DeprecationWarning",
+     "message": "open_text is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    },
+    {
+     "location": "basin3d/core/catalog.py:104",
+     "category": "DeprecationWarning",
+     "message": "is_resource is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    }
+   ],
+   "library_internal": []
+  }
+ },
+ "20261122-170131-sqladmin": {
+  "task": "sqladmin",
+  "repeat": 2,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 142,
+   "passed": 140,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 2
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-170800-confz": {
+  "task": "confz",
+  "repeat": 3,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 42,
+   "passed": 42,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-171108-withings-api": {
+  "task": "withings-api",
+  "repeat": 3,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 32,
+   "passed": 32,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-171454-netlist": {
+  "task": "netlist",
+  "repeat": 3,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 20,
+   "passed": 20,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261122-171704-morecantile": {
+  "task": "morecantile",
+  "repeat": 3,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 186,
+   "passed": 183,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 3
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261123-034353-basin3d": {
+  "task": "basin3d",
+  "repeat": 3,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 486,
+   "passed": 484,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 2
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 3,
+  "sites": {
+   "library": [],
+   "other": [
+    {
+     "location": "basin3d/core/catalog.py:224",
+     "category": "DeprecationWarning",
+     "message": "open_text is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    },
+    {
+     "location": "basin3d/core/catalog.py:288",
+     "category": "DeprecationWarning",
+     "message": "open_text is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    },
+    {
+     "location": "basin3d/core/catalog.py:104",
+     "category": "DeprecationWarning",
+     "message": "is_resource is deprecated. Use files() instead. Refer to https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy for migration advice."
+    }
+   ],
+   "library_internal": []
+  }
+ },
+ "20261123-040459-sqladmin": {
+  "task": "sqladmin",
+  "repeat": 3,
+  "impl": "langgraph",
+  "status": "passed",
+  "counts": {
+   "total": 142,
+   "passed": 140,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 2
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ }
+}

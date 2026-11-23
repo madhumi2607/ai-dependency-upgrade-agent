@@ -10,8 +10,10 @@ So I built one. Given a repository pinned to the old version, the agent upgrades
 runs the tests in Docker, reads the official migration guide, fixes what broke, and verifies the
 result with the full test suite. A human reviews the diff before anything becomes a branch.
 
-**Result:** on 12 real open-source projects (8 Pydantic, 4 SQLAlchemy), Claude Haiku 5.5 completed
-34 of 35 migrations at about $0.03 per run. No run edited or skipped a test.
+**Result:** on 18 real open-source projects (13 Pydantic, 5 SQLAlchemy), Claude Haiku 5.5 completed
+52 of 53 migrations at about $0.025 per run. No run edited or skipped a test. And because passing
+tests isn't proof of a migration, I measured that too: 92% of successful runs leave no deprecated
+old-version API behind (section 7).
 
 The model was the easy part. Here is what took the work.
 
@@ -93,16 +95,35 @@ Every task is now accepted only after a sandbox run proves its tests pass on the
 genuinely fail on the new one, with the upgrade capped (`sqlalchemy>=2.0,<2.1`, since an uncapped
 spec silently installed 2.1).
 
-## 7. Hand-written loop vs LangGraph
+## 7. Did it migrate, or just make the tests pass?
+
+A fair critique of any "N of M succeeded" number. Pydantic v2 still *runs* most v1-style code
+(`.dict()`, `@validator`, `class Config`) and only warns, so a half-done migration can pass every test.
+
+So I replayed every successful run's diff on the pinned commit, ran the exact graded test command,
+and counted the deprecated old-API call sites the suite still hits in the project's own source. All
+105 replays reproduced; 99 were measurable (one project's config hides deprecation warnings); **91
+(92%) left nothing behind.** Six of the eight exceptions are every run on one project, pydantic-cli,
+in both agents: the core was migrated but v1 `class Config` blocks were left in its example modules.
+The tests import those examples, and v2 accepts them with a warning. That's a real, systematic miss,
+and the success rate alone would never have shown it.
+
+Building the replay was its own lesson. It found a bug in how I recorded diffs (Windows text mode
+silently stripped carriage returns, so patches for CRLF files no longer applied), and my first
+version *changed the result it measured*: forcing warnings on with `-W` flipped one project's test.
+A measurement has to run exactly what was graded.
+
+## 8. Hand-written loop vs LangGraph
 
 I rebuilt the agent as a LangGraph `StateGraph`, holding the model client, tools, prompts and
 budgets constant so only the orchestration differed. A test runs one scripted session through both
-and asserts identical event streams. Then I benchmarked both on all 12 projects, 3 runs each:
+and asserts identical event streams. Then I benchmarked both on all 18 projects, 3 runs each:
 
 | | Hand-written | LangGraph |
 |---|---|---|
-| Succeeded | 34/35 | 35/36 |
-| Mean cost per run | $0.028 | $0.026 |
+| Succeeded | 52/53 | 53/54 |
+| Mean cost per run | $0.025 | $0.024 |
+| No deprecated API left | 45/49 | 46/50 |
 | Control-flow code | 75 lines | 143 lines |
 
 Same results, as you'd expect: the framework doesn't change what the agent does. It changes the
@@ -111,7 +132,7 @@ and checkpointing and human-in-the-loop interrupts come built in. For a single-a
 that's twice the code for features I don't use yet. With branching workflows or resumable runs, the
 trade would flip.
 
-## 8. Cost is a caching problem
+## 9. Cost is a caching problem
 
 Each step resends the whole conversation. Keeping the history strictly append-only lets the prompt
 cache serve 75–95% of input tokens at about 1/20 of the price, which is why a 20-step run costs two
@@ -122,9 +143,11 @@ On these tasks, Haiku succeeded about as reliably as Opus at 20–50× lower cos
 
 ## What I'd do next
 
-- Grow the benchmark from 12 projects toward 30–50; every number above has wide error bars.
+- Grade against held-out tests: where upstream ported a project itself, run upstream's
+  post-migration tests against the agent's code.
+- Grow the benchmark from 18 projects toward 30–50; every number above has wide error bars.
 - Use LangGraph's checkpointing to resume a run after a crash, now that the graph version exists.
-- Harder SQLAlchemy tasks: the current four are Core-heavy and SQLite-only; none exercises the
+- Harder SQLAlchemy tasks: the current five are mostly Core and SQLite-only; none exercises the
   2.0-style typed ORM.
 
 The code, the benchmark tasks (repo, pinned commit, install and test commands) and every results

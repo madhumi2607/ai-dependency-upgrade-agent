@@ -145,7 +145,10 @@ def main() -> None:
     done: dict[str, Any] = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
     tasks = load_tasks()
     for task_id in {r["task"] for r in rows}:
-        prepare_checkout(tasks[task_id])  # the clone source must exist; replays never modify it
+        # Replays clone the pinned commit from the checkout's git history, never its working files,
+        # so it only has to exist: an agent run may be editing it at the same time.
+        if not (tasks[task_id].checkout / ".git").is_dir():
+            prepare_checkout(tasks[task_id])
     todo = [r for r in rows if done.get(r["run_id"], {}).get("status") not in ("passed",)]
     print(f"{len(rows)} successful runs; {len(rows) - len(todo)} already measured; replaying {len(todo)}.")
 

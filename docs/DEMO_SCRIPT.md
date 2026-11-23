@@ -71,10 +71,11 @@ this review command, run by a human, creates the branch and writes the PR descri
 **Screen:** dashboard runs list with the Agent filter (All / Hand-written / LangGraph), then the
 README results tables.
 
-**Say:** "Across twelve projects and two libraries, the agent completed thirty-four of thirty-five
-migrations, at about three cents a run. I also rebuilt it in LangGraph and benchmarked both:
-identical results, twice the code. The benchmark tasks and every results file are in the repo, so
-anyone can rerun the experiments."
+**Say:** "Across eighteen projects and two libraries, the agent completed fifty-two of fifty-three
+migrations, at two to three cents a run. Passing tests isn't proof, so I also replayed every run to
+check for leftover deprecated API: ninety-two percent were fully migrated, and the README shows the
+ones that weren't. I also rebuilt it in LangGraph and benchmarked both: identical results, twice the
+code. The tasks, results and full traces are in the repo, so anyone can check the numbers."
 
 ---
 

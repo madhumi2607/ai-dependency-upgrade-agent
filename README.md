@@ -5,11 +5,11 @@ repository written for an old major version (**Pydantic v1** or **SQLAlchemy 1.4
 the dependency, runs the project's own test suite, reads the migration guide, fixes what broke, and
 verifies the result with the full suite. A human then reviews the diff and approves a branch.
 
-**Result:** on a benchmark of 12 real open-source projects across two libraries, Claude Haiku 5.5
-completed **34 of 35 migrations** (3 attempts per project): 22/23 for Pydantic v1 → v2 and 12/12
-for SQLAlchemy 1.4 → 2.0, at about **$0.03 per run**. No run edited or skipped a test. Passing tests
-isn't the whole story, so completeness was measured too: in 90% of measurable successful runs no
-deprecated old-version API is left; the exceptions are all one project, where the agent migrated the
+**Result:** on a benchmark of 18 real open-source projects across two libraries, Claude Haiku 5.5
+completed **52 of 53 migrations** (3 attempts per project): 37/38 for Pydantic v1 → v2 and 15/15
+for SQLAlchemy 1.4 → 2.0, at about **$0.025 per run**. No run edited or skipped a test. Passing tests
+isn't the whole story, so completeness was measured too: in **92%** of measurable successful runs no
+deprecated old-version API is left; most exceptions are one project, where the agent migrated the
 library but left v1 config in its example modules (see "What the success rate does and doesn't measure").
 
 | | |
@@ -73,7 +73,7 @@ flowchart LR
 
 ## Results
 
-### Pydantic v1 → v2: 8 real projects, Claude Haiku 5.5, docs search on, 3 runs each
+### Pydantic v1 → v2: 13 real projects, Claude Haiku 5.5, docs search on, 3 runs each
 
 Each task is a public repo pinned to a commit that depends on Pydantic v1. A task is only
 accepted after a sandbox check: its own tests pass on v1 and genuinely fail on v2.
@@ -88,17 +88,22 @@ accepted after a sandbox check: its own tests pass on v1 and genuinely fail on v
 | [pydantic-cli](https://github.com/mpkocher/pydantic-cli) | hard | core built on v1 field internals | 3/3 | 32 | $0.052 | 35/35 |
 | [gto](https://github.com/iterative/gto) | hard | `BaseSettings` with custom sources, `parse_obj_as` | 3/3 | 28 | $0.038 | 141/141 |
 | [copier](https://github.com/copier-org/copier) | hard | v1 error/validator internals, pydantic dataclasses | 1/2 | 39.5 | $0.085 | 691/696* |
+| [ConfZ](https://github.com/Zuehlke/ConfZ) | easy | inner `Config` (`allow_mutation`) | 3/3 | 20 | $0.015 | 42/42 |
+| [withings-api](https://github.com/vangorra/python_withings_api) | medium | v1 custom types (`__get_validators__`), validators | 3/3 | 19 | $0.019 | 32/32 |
+| [morecantile](https://github.com/developmentseed/morecantile) | medium | `conlist(min_items=)`, custom root `__root__` | 3/3 | 23 | $0.031 | 183/186* |
+| [basin3d](https://github.com/BASIN-3D/basin3d) | medium | custom type schema, `class Config` | 3/3 | 22 | $0.030 | 484/486* |
+| [Netlist](https://github.com/dan-fritchman/Netlist) | hard | `GenericModel`, `__pydantic_model__`, pydantic dataclasses | 3/3 | 11 | $0.009 | 20/20 |
 
-\* 5 skipped, as on v1. copier's third run was cut short twice by infrastructure and isn't counted.
+\* Skipped tests are skipped on v1 too. copier's third run was cut short twice by infrastructure and isn't counted.
 The failed run reached 690/696 before the 40-step limit. The successful run solved the hardest part
 without touching tests: upstream's own port *changed* a test that expects a `TypeError`, while the
 agent kept v1 behaviour by making `Worker` a plain dataclass and validating its fields with a separate
 Pydantic model in `__post_init__`.
 
-### SQLAlchemy 1.4 → 2.0: 4 real projects, same setup
+### SQLAlchemy 1.4 → 2.0: 5 real projects, same setup
 
 The upgrade is capped at `<2.1`: uncapped, pip installed 2.1.9, which would mix 2.1's own changes
-into a 2.0 migration. Total cost of the 12 runs: $0.25.
+into a 2.0 migration.
 
 | Project | Difficulty | What breaks under 2.0 | Succeeded | Median steps | Avg cost | Tests after |
 |---|---|---|---|---|---|---|
@@ -106,6 +111,7 @@ into a 2.0 migration. Total cost of the 12 runs: $0.25.
 | [coilmq](https://github.com/coilmq/coilmq) | easy | bound `MetaData`, `select([...])`, `row[Column]` | 3/3 | 11 | $0.015 | 201/204* |
 | [dataset](https://github.com/pudo/dataset) | medium | bound `MetaData`, `engine.execute`, library-level autocommit removed | 3/3 | 19 | $0.027 | 57/57† |
 | [rdflib-sqlalchemy](https://github.com/RDFLib/rdflib-sqlalchemy) | medium | `select([...])`, positional `select()`/`delete()` arguments | 3/3 | 22 | $0.032 | 44/48* |
+| [sqladmin](https://github.com/aminalaee/sqladmin) | easy | string attribute names in loader options removed | 3/3 | 12 | $0.007 | 140/142* |
 
 \* Skipped tests are skipped on 1.4 too (other databases). † Two tests call `Table.exists()`, removed
 in 2.0, from the test code itself; they can't pass without editing tests, so the task deselects them.
@@ -127,18 +133,24 @@ correct migration but not sufficient, so three more things were measured or stat
 replays every successful run's diff on the pinned commit, runs the exact graded test command, and
 counts the deprecated old-API call sites in the project's own source that the suite still hits.
 
-| | Runs | Measurable | No deprecated API left |
+| | Successful runs | Measurable | No deprecated API left |
 |---|---|---|---|
-| Hand-written loop | 34 | 31 | 28 |
-| LangGraph | 35 | 32 | 29 |
-| **Total** | **69** | **63** | **57 (90%)** |
+| Hand-written loop | 52 | 49 | 45 |
+| LangGraph | 53 | 50 | 46 |
+| **Total** | **105** | **99** | **91 (92%)** |
 
-All 69 replays reproduced the original result. The 6 that aren't measurable are rdflib-sqlalchemy,
-whose pytest config hides every `DeprecationWarning`. **The 6 incomplete ones are every pydantic-cli
-run, in both agents:** the core was migrated, but v1 `class Config` blocks were left in the package's
-`examples/` modules (10–29 call sites), which the tests import and v2 still accepts with a warning.
-A migration a user would copy from those examples is still v1. The metric only sees code the tests
-execute; it was checked against a positive control (geojson-pydantic's unmigrated code is flagged).
+All 105 replays reproduced the original result. The 6 that aren't measurable are rdflib-sqlalchemy,
+whose pytest config hides every `DeprecationWarning`. Of the 8 incomplete ones:
+
+- **6 are every pydantic-cli run, in both agents:** the core was migrated, but v1 `class Config`
+  blocks were left in the package's `examples/` modules (10–29 call sites), which the tests import
+  and v2 still accepts with a warning. A migration a user would copy from those examples is still v1.
+  Systematic, so it's a model behaviour on that code base, not a loop bug.
+- **2 are single leftovers:** one `parse_file` call in a morecantile run and one `.copy()` (now
+  `model_copy`) in a basin3d run. The other runs of both tasks are clean.
+
+The metric only sees code the tests execute; it was checked against a positive control
+(geojson-pydantic's unmigrated code is flagged).
 
 **Task selection.** Tasks are chosen so their *tests* only use APIs that survive the upgrade,
 because the agent may not edit tests. That's a deliberate rule, but it means projects whose own test
@@ -161,7 +173,7 @@ emails); unpack into `runs/` to inspect them in the dashboard.
 
 On these tasks Haiku succeeds about as reliably as Opus at **20–50× lower cost**.
 
-### Hand-written loop vs LangGraph (Haiku, all 12 tasks, 3 runs each)
+### Hand-written loop vs LangGraph (Haiku, all 18 tasks, 3 runs each)
 
 The same agent was rebuilt as a LangGraph `StateGraph` (`agent_langgraph/`): nodes for baseline,
 model call, tools, nudge and final run, with routing functions between them. It deliberately reuses
@@ -170,10 +182,11 @@ a test runs one scripted session through both and asserts identical event stream
 
 | | Hand-written loop | LangGraph |
 |---|---|---|
-| Succeeded | 34/35 | 35/36 |
-| Median steps | 17 | 19 |
-| Mean cost per run | $0.028 | $0.026 |
+| Succeeded | 52/53 | 53/54 |
+| Median steps | 19 | 19 |
+| Mean cost per run | $0.025 | $0.024 |
 | Review-check findings | 1 warning (a weak pin) | none |
+| No deprecated API left (completeness) | 45/49 | 46/50 |
 | Code for the control flow | 75 lines | 143 lines |
 | New dependencies | none | `langgraph` (+ ~20 packages) |
 
@@ -187,8 +200,9 @@ dependency tree, and a recursion limit that has to be set above the agent's own 
 single-agent loop this size, the hand-written version is simpler; LangGraph would pay off with
 branching workflows, resumable runs or several cooperating agents.
 
-The loop's runs are from 17–18 Nov, LangGraph's from 18–22 Nov; the only code change in between
-that reaches the model is the per-library wording of one prompt rule.
+For the first 12 tasks, the loop's runs are from 17–18 Nov and LangGraph's from 18–22 Nov; the
+only code change in between that reaches the model is the per-library wording of one prompt rule.
+The 6 newer tasks were run with both agents on 22–23 Nov.
 
 ### Does docs search help? (Haiku, 3 runs per setting)
 
@@ -301,8 +315,7 @@ tests/            tests for this project's own code
 
 ## Limitations and next steps
 
-- **Small benchmark.** 18 verified projects (results above cover the first 12), so every number has
-  wide error bars. Small SQLAlchemy libraries that pinned `<2` *and* have SQLite-only tests that
+- **Small benchmark.** 18 verified projects, so every number has wide error bars. Small SQLAlchemy libraries that pinned `<2` *and* have SQLite-only tests that
   survive the upgrade turned out to be rare; most candidates were rejected.
 - **The SQLAlchemy tasks are Core-heavy and SQLite-only.** None of them exercises the 2.0-style ORM
   (`Mapped[]`, `DeclarativeBase`) or a server database; those would be harder tasks.
