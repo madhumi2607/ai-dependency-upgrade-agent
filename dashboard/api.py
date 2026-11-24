@@ -21,7 +21,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RUNS_DIR = Path(os.environ.get("RUNS_DIR", PROJECT_ROOT / "runs"))
 WEB_DIST = Path(__file__).parent / "web" / "dist"
 
-app = FastAPI(title="Migration Agent dashboard")
+app = FastAPI(title="Molt dashboard")
 
 
 @app.get("/api/runs")

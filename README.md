@@ -1,6 +1,8 @@
-# Upgrade Agent
+# Molt
 
-An autonomous AI agent that upgrades Python codebases across breaking library releases. Given a
+**An AI agent that sheds deprecated APIs.**
+
+Molt is an autonomous AI agent that upgrades Python codebases across breaking library releases. Given a
 repository written for an old major version (**Pydantic v1** or **SQLAlchemy 1.4**), it upgrades
 the dependency, runs the project's own test suite, reads the migration guide, fixes what broke, and
 verifies the result with the full suite. A human then reviews the diff and approves a branch.

@@ -31,7 +31,7 @@ export default function App() {
         <a href="/" onClick={(e) => { e.preventDefault(); navigate("/"); }} className="brand">
           <span className="brand-mark" aria-hidden>⇡</span>
           <span>
-            Migration Agent
+            Molt
             <span className="brand-sub">run viewer</span>
           </span>
         </a>
