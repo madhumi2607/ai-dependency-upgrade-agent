@@ -1,4 +1,4 @@
-# Migration Agent
+# Upgrade Agent
 
 An autonomous AI agent that upgrades Python codebases across breaking library releases. Given a
 repository written for an old major version (**Pydantic v1** or **SQLAlchemy 1.4**), it upgrades
