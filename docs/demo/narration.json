@@ -1,15 +1,76 @@
 {
  "voice": "ElevenLabs \"Miles - Clear Explainer Narrator\" (eleven_v4)",
  "clips": [
-  {"file": "voice/01.mp3", "scene": "title", "text": "This is Migration Agent: an AI agent that upgrades real Python codebases across breaking library releases, and proves it with the project's own tests."},
-  {"file": "voice/02.mp3", "scene": "runs", "text": "Every run is recorded: tests before and after, review checks, and cost. There are two versions of the same agent: a hand-written loop, and a LangGraph graph."},
-  {"file": "voice/03.mp3", "scene": "start", "text": "Now, a live run. agate-sql is a real open-source project, pinned to SQLAlchemy 1.4. The agent will upgrade it to 2.0."},
-  {"file": "voice/04.mp3", "scene": "baseline", "text": "First, the baseline. The project is installed in a fresh Docker container, SQLAlchemy 2.0 is forced on top, and its own test suite runs. The agent can only act through MCP tool servers: one to read and edit the code, one to run the tests in the sandbox, and one to search the official migration guide. And the guardrails live in code, not in the prompt. The tools refuse to edit, skip, or deselect a test."},
-  {"file": "voice/05.mp3", "scene": "failures", "text": "Nine of the eighteen tests fail on 2.0. The failures are grouped by root cause, and handed to the model."},
-  {"file": "voice/06.mp3", "scene": "working", "offset": 20, "text": "It looks up the new API in the migration guide. The search is hybrid, keyword plus embeddings, because the agent searches with exact error messages. Edits are exact-text replacements, and test results come back as a short, structured summary, not thousands of lines of logs. When the model calls finish, that's only a request. The loop runs the full suite itself, and accepts the result only if everything passes."},
-  {"file": "voice/07.mp3", "scene": "verified", "text": "Verified. All eighteen tests pass on SQLAlchemy 2.0, in thirteen steps."},
-  {"file": "voice/08.mp3", "scene": "cost", "text": "The whole run cost about a cent, mostly served from the prompt cache."},
-  {"file": "voice/09.mp3", "scene": "diff", "text": "Review checks then scan the diff for weak version pins, compatibility shims, and test edits. And nothing becomes a branch until a human approves it."},
-  {"file": "voice/10.mp3", "scene": "end", "text": "Across eighteen real projects, the agent completed fifty-two of fifty-three migrations, at about two and a half cents a run. Ninety-two percent left no deprecated API behind, and held-out upstream tests found no migration errors."}
+  {
+   "file": "voice/01.mp3",
+   "scene": "title",
+   "text": "This is Molt: AI agents that shed deprecated APIs. A migrator agent upgrades real Python codebases across breaking library releases, and proves it with the project's own tests."
+  },
+  {
+   "file": "voice/02.mp3",
+   "scene": "runs",
+   "text": "Every run is recorded: tests before and after, review checks, and cost. There are two versions of the same agent: a hand-written loop, and a LangGraph graph."
+  },
+  {
+   "file": "voice/03.mp3",
+   "scene": "start",
+   "text": "Now, a live run. agate-sql is a real open-source project, pinned to SQLAlchemy 1.4. The agent will upgrade it to 2.0."
+  },
+  {
+   "file": "voice/04.mp3",
+   "scene": "baseline",
+   "text": "First, the baseline. The project is installed in a fresh Docker container, SQLAlchemy 2.0 is forced on top, and its own test suite runs. The agent can only act through MCP tool servers: one to read and edit the code, one to run the tests in the sandbox, and one to search the official migration guide. And the guardrails live in code, not in the prompt. The tools refuse to edit, skip, or deselect a test."
+  },
+  {
+   "file": "voice/05.mp3",
+   "scene": "failures",
+   "text": "Nine of the eighteen tests fail on 2.0. The failures are grouped by root cause, and handed to the model."
+  },
+  {
+   "file": "voice/06.mp3",
+   "scene": "working",
+   "offset": 20,
+   "text": "It looks up the new API in the migration guide. The search is hybrid, keyword plus embeddings, because the agent searches with exact error messages. Edits are exact-text replacements, and test results come back as a short, structured summary, not thousands of lines of logs. When the model calls finish, that's only a request. The loop runs the full suite itself, and accepts the result only if everything passes."
+  },
+  {
+   "file": "voice/07.mp3",
+   "scene": "verified",
+   "text": "Verified. All eighteen tests pass on SQLAlchemy 2.0, in thirteen steps."
+  },
+  {
+   "file": "voice/08.mp3",
+   "scene": "cost",
+   "text": "The whole run cost about a cent, mostly served from the prompt cache."
+  },
+  {
+   "file": "voice/09.mp3",
+   "scene": "diff",
+   "text": "Review checks then scan the diff for weak version pins, compatibility shims, and test edits. And nothing becomes a branch until a human approves it."
+  },
+  {
+   "file": "voice/m1.mp3",
+   "scene": "multi_intro",
+   "text": "Now, multi-agent mode. This is a recorded run on pydantic-cli, the task where the single agent always left old code behind."
+  },
+  {
+   "file": "voice/m2.mp3",
+   "scene": "multi_verified",
+   "text": "The migrator passes all thirty-five tests. Then a second agent, the reviewer, starts with a fresh context and read-only tools."
+  },
+  {
+   "file": "voice/m3.mp3",
+   "scene": "multi_find",
+   "text": "Its find-deprecations tool finds ten old call sites in the examples, which the tests can't see. It sends nine findings back to the migrator, each with the file, the line, and the fix."
+  },
+  {
+   "file": "voice/m4.mp3",
+   "scene": "multi_fixed",
+   "text": "The migrator fixes them, and passes again. The reviewer checks once more: zero left. Without the reviewer, every run on this task left between ten and twenty-nine."
+  },
+  {
+   "file": "voice/10.mp3",
+   "scene": "end",
+   "text": "Across eighteen real projects, the single agent completed fifty-two of fifty-three migrations, at about two and a half cents a run. On the hardest case, the reviewer agent took leftover deprecated API down to zero. And held-out upstream tests found no migration errors."
+  }
  ]
 }

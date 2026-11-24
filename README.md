@@ -1,11 +1,13 @@
 # Molt
 
-**An AI agent that sheds deprecated APIs.**
+**AI agents that shed deprecated APIs.**
 
-Molt is an autonomous AI agent that upgrades Python codebases across breaking library releases. Given a
+Molt's migrator agent upgrades Python codebases across breaking library releases. Given a
 repository written for an old major version (**Pydantic v1** or **SQLAlchemy 1.4**), it upgrades
 the dependency, runs the project's own test suite, reads the migration guide, fixes what broke, and
-verifies the result with the full suite. A human then reviews the diff and approves a branch.
+verifies the result with the full suite. An optional second agent, a reviewer, then hunts for old
+API the tests can't see and sends findings back (see "Multi-agent"). A human reviews the diff and
+approves a branch.
 
 **Result:** on a benchmark of 18 real open-source projects across two libraries, Claude Haiku 5.5
 completed **52 of 53 migrations** (3 attempts per project): 37/38 for Pydantic v1 → v2 and 15/15
@@ -21,7 +23,7 @@ library but left v1 config in its example modules (see "What the success rate do
 | Models | Claude (default), Gemini, Groq behind one small interface |
 | Verification | the project's own tests in Docker, plus automatic review checks on the final diff |
 | Observability | every model and tool call recorded; React dashboard with per-run charts |
-| Demo | [docs/demo/demo.mp4](docs/demo/demo.mp4): a real run watched live in the dashboard (3:13, narrated and captioned; recorded automatically by `docs/demo/record_demo.py`, voiceover added by `docs/demo/narrate.py`) |
+| Demo | [docs/demo/demo.mp4](docs/demo/demo.mp4) (4:02, narrated and captioned): a live single-agent run in the dashboard, then a walkthrough of a recorded reviewer run. Built by `docs/demo/record_demo.py`, `record_multi.py`, `compose.py` and `narrate.py` |
 
 ---
 

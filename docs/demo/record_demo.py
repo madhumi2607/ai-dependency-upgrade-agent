@@ -1,8 +1,8 @@
 """Record the demo video automatically: a real agent run, watched live in the dashboard.
 
 Starts the dashboard and one agent run (agate-sql, SQLAlchemy 1.4 -> 2.0, about $0.01), drives a
-headless Chromium through the dashboard with captions, and writes docs/demo/demo-silent.mp4
-(captions only) plus scenes.json; docs/demo/narrate.py then adds the voiceover as demo.mp4. Playwright and ffmpeg are only needed here, so they're pulled into a throwaway
+headless Chromium through the dashboard with captions, and writes docs/demo/demo-run.mp4 plus
+scenes-run.json; compose.py assembles the full video and narrate.py adds the voiceover as demo.mp4. Playwright and ffmpeg are only needed here, so they're pulled into a throwaway
 environment instead of the project's dependencies:
 
     uv run --env-file .env --with playwright==1.48.0 --with imageio-ffmpeg python docs/demo/record_demo.py
@@ -47,17 +47,19 @@ body {{ margin:0; height:100vh; display:flex; align-items:center; justify-conten
 p {{ font-size: 23px; line-height: 1.5; color:#c3c2b7; margin: 8px 0; }} b {{ color:#f3f2ec; }}
 </style></head><body><div class="box">{body}</div></body></html>"""
 
-TITLE = """<h1>Migration Agent</h1>
-<p>An AI agent that upgrades real Python codebases across breaking library releases
-(<b>Pydantic v1 → v2</b>, <b>SQLAlchemy 1.4 → 2.0</b>), and proves it with the project's own tests.</p>
+TITLE = """<h1>Molt</h1>
+<p><b>AI agents that shed deprecated APIs.</b></p>
+<p>A migrator agent upgrades real Python codebases across breaking library releases
+(<b>Pydantic v1 → v2</b>, <b>SQLAlchemy 1.4 → 2.0</b>) and proves it with the project's own tests;
+a reviewer agent then hunts for old API the tests can't see.</p>
 <p>What follows is a real, unedited run, recorded automatically (played at 1.4× speed).</p>"""
 
 END = """<h1>Results</h1>
 <p><b>18</b> real open-source projects, two libraries</p>
-<p><b>52 / 53</b> migrations succeeded &nbsp;·&nbsp; about <b>$0.025</b> per run &nbsp;·&nbsp; no test edited or skipped</p>
+<p>Single agent: <b>52 / 53</b> migrations &nbsp;·&nbsp; about <b>$0.025</b> per run &nbsp;·&nbsp; no test edited or skipped</p>
 <p><b>92%</b> of successful runs leave no deprecated API behind (replayed and measured)</p>
-<p>Held-out upstream tests: every failure traced to upstream design changes, none to the migration</p>
-<p>Same results from a LangGraph rebuild, at twice the code</p>"""
+<p>Reviewer agent, on the hardest case: leftover deprecated API <b>10–29 → 0</b> (preliminary)</p>
+<p>Held-out upstream tests: every failure traced to upstream design changes, none to the migration</p>"""
 
 # What the agent is doing -> what the caption says (keyed by tool name).
 TOOL_CAPTIONS = {
@@ -245,13 +247,13 @@ def main() -> None:
             context.close()
             browser.close()
 
-        mp4 = OUT / "demo-silent.mp4"  # captions only; docs/demo/narrate.py adds the voiceover -> demo.mp4
+        mp4 = OUT / "demo-run.mp4"  # the live run; compose.py adds the title, multi-agent and end parts
         subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error", "-i", str(video),
                         "-filter:v", f"setpts=PTS/{SPEED}", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "26", "-preset", "slow",
                         "-movflags", "+faststart", str(mp4)], check=True)
         shutil.rmtree(OUT / "raw", ignore_errors=True)
         # Scene start times and the run's numbers, for docs/demo/narrate.py to place the voiceover.
-        (OUT / "scenes.json").write_text(json.dumps({"run_id": run_id, "facts": facts, "scenes": SCENES}, indent=1),
+        (OUT / "scenes-run.json").write_text(json.dumps({"run_id": run_id, "facts": facts, "scenes": SCENES}, indent=1),
                                          encoding="utf-8")
         print(f"run {run_id}: {s['status']}, {s['steps']} steps; video: {mp4} ({mp4.stat().st_size / 1e6:.1f} MB)")
     finally:

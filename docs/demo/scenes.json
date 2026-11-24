@@ -1,16 +1,4 @@
 {
- "run_id": "20261123-100318-agate-sql",
- "facts": {
-  "task": "agate-sql",
-  "model": "claude-haiku-5-5",
-  "speed": 1.4,
-  "failing": 9,
-  "total": 18,
-  "status": "succeeded",
-  "steps": 13,
-  "passed": 18,
-  "cost": 0.01166915
- },
  "scenes": [
   {
    "scene": "title",
@@ -57,8 +45,36 @@
    "at": 172.72
   },
   {
+   "scene": "multi_intro",
+   "at": 178.26
+  },
+  {
+   "scene": "multi_verified",
+   "at": 185.92
+  },
+  {
+   "scene": "multi_find",
+   "at": 194.01
+  },
+  {
+   "scene": "multi_findings",
+   "at": 201.59
+  },
+  {
+   "scene": "multi_fixed",
+   "at": 210.17
+  },
+  {
+   "scene": "multi_zero",
+   "at": 216.21
+  },
+  {
+   "scene": "multi_done",
+   "at": 224.23
+  },
+  {
    "scene": "end",
-   "at": 177.73
+   "at": 224.41
   }
  ]
 }

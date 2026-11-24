@@ -1,0 +1,33 @@
+{
+ "run_id": "20261123-110126-pydantic-cli",
+ "scenes": [
+  {
+   "scene": "multi_intro",
+   "at": 0.53
+  },
+  {
+   "scene": "multi_verified",
+   "at": 8.19
+  },
+  {
+   "scene": "multi_find",
+   "at": 16.28
+  },
+  {
+   "scene": "multi_findings",
+   "at": 23.86
+  },
+  {
+   "scene": "multi_fixed",
+   "at": 32.44
+  },
+  {
+   "scene": "multi_zero",
+   "at": 38.48
+  },
+  {
+   "scene": "multi_done",
+   "at": 46.5
+  }
+ ]
+}
