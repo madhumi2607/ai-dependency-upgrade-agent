@@ -31,6 +31,7 @@ unit-test and draw, and hooks for checkpointing / human-in-the-loop interrupts (
 """
 
 import asyncio
+import json
 import operator
 import subprocess
 import time
@@ -240,7 +241,7 @@ def build_graph(llm: LLM, toolbox: ToolBox, task: TaskSpec, config: LoopConfig, 
         for call in state["review_pending"]:
             started = time.monotonic()
             if call.name == review_prompts.SUBMIT_REVIEW.name and call.error is None:
-                findings = [f for f in call.arguments.get("findings") or [] if str(f).strip()]
+                findings = _findings(call.arguments.get("findings"))
                 verdict = {"approve": bool(call.arguments.get("approve")) or not findings, "findings": findings}
                 content = "Review recorded."
             elif call.name not in REVIEWER_TOOLS and call.name != review_prompts.SUBMIT_REVIEW.name:
@@ -314,6 +315,18 @@ def build_graph(llm: LLM, toolbox: ToolBox, task: TaskSpec, config: LoopConfig, 
         graph.add_conditional_edges("reviewer_tools", after_reviewer_tools, ["reviewer", "deliver", END])
         graph.add_edge("deliver", "agent")
     return graph.compile()
+
+
+def _findings(raw: Any) -> list[str]:
+    """submit_review's findings as a list of strings. Models sometimes send the list JSON-encoded
+    as one string; iterating that string once turned one finding into 529 one-character ones."""
+    if isinstance(raw, str):
+        try:
+            decoded = json.loads(raw)
+        except json.JSONDecodeError:
+            decoded = [raw]  # a plain sentence: one finding
+        raw = decoded if isinstance(decoded, list) else [str(decoded)]
+    return [str(f).strip() for f in raw or [] if str(f).strip()]
 
 
 def migrator_tools(toolbox: ToolBox) -> list:

@@ -136,3 +136,12 @@ def test_findings_come_with_a_fresh_step_allowance(tmp_path: Path) -> None:
     result, _ = run(llm, repo, [FAILING, PASSING])
     assert result.success and result.stop_reason == "finished" and result.summary == "fixed"
     assert "FieldInfo" in (repo / "pkg" / "models.py").read_text()
+
+
+def test_findings_sent_as_a_json_string_are_decoded() -> None:
+    """A real run's reviewer sent its list JSON-encoded; it was split into 529 single characters."""
+    from agent_langgraph.graph import _findings
+
+    assert _findings('["a.py:1 use model_dump", "b.py:2 use pattern="]') == ["a.py:1 use model_dump", "b.py:2 use pattern="]
+    assert _findings("a.py:1 still uses .dict()") == ["a.py:1 still uses .dict()"]
+    assert _findings(["x", " ", ""]) == ["x"] and _findings(None) == []

@@ -1,0 +1,388 @@
+{
+ "name": "multi-haiku-all18",
+ "started_at": "2026-11-23T10:46:16.197490+00:00",
+ "config": {
+  "models": [
+   "claude-haiku-5-5"
+  ],
+  "docs": "on",
+  "tasks": [
+   "geojson-pydantic",
+   "fastapi-restful",
+   "pydantic-cli",
+   "pyonwater",
+   "pydantic-sqlite",
+   "dbt-cloud-cli",
+   "gto",
+   "copier",
+   "dataset",
+   "rdflib-sqlalchemy",
+   "agate-sql",
+   "coilmq",
+   "confz",
+   "withings-api",
+   "netlist",
+   "morecantile",
+   "basin3d",
+   "sqladmin"
+  ],
+  "max_steps": 40,
+  "repeats": 3,
+  "impl": "multi"
+ },
+ "rows": [
+  {
+   "task": "geojson-pydantic",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-104627-geojson-pydantic",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 36,
+   "input_tokens": 1243678,
+   "cache_read_tokens": 1134635,
+   "output_tokens": 24698,
+   "cost_usd": 0.03459965,
+   "duration_seconds": 485.432614,
+   "tests_before": {
+    "status": "failed",
+    "passed": 0,
+    "total": 3
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 134,
+    "total": 134
+   },
+   "files_changed": 7,
+   "lines_added": 67,
+   "lines_removed": 37,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "fastapi-restful",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-105446-fastapi-restful",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 32,
+   "input_tokens": 697353,
+   "cache_read_tokens": 621422,
+   "output_tokens": 17538,
+   "cost_usd": 0.02257632,
+   "duration_seconds": 388.319499,
+   "tests_before": {
+    "status": "startup_error",
+    "passed": 0,
+    "total": null
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 69,
+    "total": 69
+   },
+   "files_changed": 7,
+   "lines_added": 27,
+   "lines_removed": 23,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "pydantic-cli",
+   "difficulty": "hard",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-110126-pydantic-cli",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 64,
+   "input_tokens": 5902779,
+   "cache_read_tokens": 5645544,
+   "output_tokens": 94710,
+   "cost_usd": 0.12953394000000001,
+   "duration_seconds": 687.909147,
+   "tests_before": {
+    "status": "failed",
+    "passed": 0,
+    "total": 15
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 35,
+    "total": 35
+   },
+   "files_changed": 15,
+   "lines_added": 207,
+   "lines_removed": 165,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "pyonwater",
+   "difficulty": "easy",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-111309-pyonwater",
+   "success": true,
+   "stop_reason": "finished",
+   "failure_category": null,
+   "steps": 12,
+   "input_tokens": 292666,
+   "cache_read_tokens": 258014,
+   "output_tokens": 4559,
+   "cost_usd": 0.00832484,
+   "duration_seconds": 135.400319,
+   "tests_before": {
+    "status": "failed",
+    "passed": 10,
+    "total": 25
+   },
+   "tests_after": {
+    "status": "passed",
+    "passed": 25,
+    "total": 25
+   },
+   "files_changed": 4,
+   "lines_added": 7,
+   "lines_removed": 7,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "pydantic-sqlite",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-111537-pydantic-sqlite",
+   "success": false,
+   "stop_reason": "llm_error",
+   "failure_category": "infrastructure",
+   "steps": 0,
+   "input_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.0,
+   "duration_seconds": 68.855274,
+   "tests_before": {
+    "status": "failed",
+    "passed": 0,
+    "total": 5
+   },
+   "tests_after": {
+    "status": "failed",
+    "passed": 0,
+    "total": 5
+   },
+   "files_changed": 0,
+   "lines_added": 0,
+   "lines_removed": 0,
+   "check_errors": 1,
+   "check_warnings": 0,
+   "check_findings": [
+    "[error] pins: pydantic is pinned to '<2,>=1.8.2', which excludes the upgrade target <3,>=2."
+   ],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "dbt-cloud-cli",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-111657-dbt-cloud-cli",
+   "success": false,
+   "stop_reason": "llm_error",
+   "failure_category": "infrastructure",
+   "steps": 0,
+   "input_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.0,
+   "duration_seconds": 80.244875,
+   "tests_before": {
+    "status": "startup_error",
+    "passed": 0,
+    "total": null
+   },
+   "tests_after": {
+    "status": "startup_error",
+    "passed": 0,
+    "total": null
+   },
+   "files_changed": 0,
+   "lines_added": 0,
+   "lines_removed": 0,
+   "check_errors": 1,
+   "check_warnings": 0,
+   "check_findings": [
+    "[error] pins: pydantic is pinned to '==1.10.10', which excludes the upgrade target <3,>=2."
+   ],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "gto",
+   "difficulty": "hard",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-111830-gto",
+   "success": false,
+   "stop_reason": "llm_error",
+   "failure_category": "infrastructure",
+   "steps": 0,
+   "input_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.0,
+   "duration_seconds": 142.122564,
+   "tests_before": {
+    "status": "startup_error",
+    "passed": 0,
+    "total": null
+   },
+   "tests_after": {
+    "status": "startup_error",
+    "passed": 0,
+    "total": null
+   },
+   "files_changed": 0,
+   "lines_added": 0,
+   "lines_removed": 0,
+   "check_errors": 0,
+   "check_warnings": 0,
+   "check_findings": [],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "copier",
+   "difficulty": "hard",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-112105-copier",
+   "success": false,
+   "stop_reason": "llm_error",
+   "failure_category": "infrastructure",
+   "steps": 0,
+   "input_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.0,
+   "duration_seconds": 92.438706,
+   "tests_before": {
+    "status": "startup_error",
+    "passed": 0,
+    "total": null
+   },
+   "tests_after": {
+    "status": "startup_error",
+    "passed": 0,
+    "total": null
+   },
+   "files_changed": 0,
+   "lines_added": 0,
+   "lines_removed": 0,
+   "check_errors": 1,
+   "check_warnings": 0,
+   "check_findings": [
+    "[error] pins: pydantic is pinned to '<2,>=1.10.2', which excludes the upgrade target <3,>=2."
+   ],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "dataset",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-112249-dataset",
+   "success": false,
+   "stop_reason": "llm_error",
+   "failure_category": "infrastructure",
+   "steps": 0,
+   "input_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.0,
+   "duration_seconds": 77.521465,
+   "tests_before": {
+    "status": "failed",
+    "passed": 0,
+    "total": 57
+   },
+   "tests_after": {
+    "status": "failed",
+    "passed": 0,
+    "total": 57
+   },
+   "files_changed": 0,
+   "lines_added": 0,
+   "lines_removed": 0,
+   "check_errors": 1,
+   "check_warnings": 0,
+   "check_findings": [
+    "[error] pins: sqlalchemy is pinned to '<2.0.0,>=1.3.2', which excludes the upgrade target <2.1,>=2.0."
+   ],
+   "repeat": 1,
+   "impl": "multi"
+  },
+  {
+   "task": "rdflib-sqlalchemy",
+   "difficulty": "medium",
+   "model": "claude-haiku-5-5",
+   "docs_search": true,
+   "run_id": "20261123-112419-rdflib-sqlalchemy",
+   "success": false,
+   "stop_reason": "llm_error",
+   "failure_category": "infrastructure",
+   "steps": 0,
+   "input_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.0,
+   "duration_seconds": 98.964612,
+   "tests_before": {
+    "status": "failed",
+    "passed": 14,
+    "total": 48
+   },
+   "tests_after": {
+    "status": "failed",
+    "passed": 14,
+    "total": 48
+   },
+   "files_changed": 0,
+   "lines_added": 0,
+   "lines_removed": 0,
+   "check_errors": 1,
+   "check_warnings": 0,
+   "check_findings": [
+    "[error] pins: sqlalchemy is pinned to '<2.0.0,>=1.1.4', which excludes the upgrade target <2.1,>=2.0."
+   ],
+   "repeat": 1,
+   "impl": "multi"
+  }
+ ],
+ "notes": [
+  "Stopped after 10 of 54 runs: the Anthropic API credit ran out (runs 5-10 are llm_error / infrastructure, and pyonwater's review call failed on the same limit, so that run was never really reviewed). Resume with: python -m benchmark.runner --name x --resume <this file>."
+ ]
+}

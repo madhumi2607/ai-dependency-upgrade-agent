@@ -140,7 +140,28 @@ and checkpointing and human-in-the-loop interrupts come built in. For a single-a
 that's twice the code for features I don't use yet. With branching workflows or resumable runs, the
 trade would flip.
 
-## 9. Cost is a caching problem
+## 9. Going multi-agent, for a measured reason
+
+The completeness numbers gave the second agent a job. Once the tests pass, the migrator has no
+signal that old API is left, which is why every pydantic-cli run left v1 config in its examples. So
+the LangGraph version gained a **reviewer**: after a verified finish, a second agent with a fresh
+context and read-only tools (including a `find_deprecations` tool built from the completeness
+parser) either approves or sends file:line findings back, and the migrator must pass verification
+again.
+
+On pydantic-cli it worked: 0 deprecated call sites left in both runs, against 10–29 in all six
+single-agent runs, at about twice the model calls. On another project it found a stale
+`pydantic~=1.0` pin in a pre-commit config and a broken README example, which neither the tests
+nor my metric could see. Two lessons came from building it rather than designing it: the first
+review arrived with 7 of the migrator's 40 steps left (findings now come with their own budget), and
+a reviewer once sent its findings list as one JSON-encoded string, which my code split into 529
+one-character findings. Don't trust a model's argument types.
+
+The full benchmark is pending: it stopped when the API credit ran out, and free tiers couldn't run
+it (one agent step is larger than Groq's per-minute token limit). So this is a strong result on the
+case that motivated it, not yet a benchmark-scale one, and the README says exactly that.
+
+## 10. Cost is a caching problem
 
 Each step resends the whole conversation. Keeping the history strictly append-only lets the prompt
 cache serve 75–95% of input tokens at about 1/20 of the price, which is why a 20-step run costs two

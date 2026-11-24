@@ -14,7 +14,7 @@ library but left v1 config in its example modules (see "What the success rate do
 
 | | |
 |---|---|
-| Agent loop | hand-written Python, plus an equivalent LangGraph version for comparison |
+| Agent loop | hand-written Python, plus an equivalent LangGraph version, plus a multi-agent mode (migrator + reviewer) |
 | Tools | [MCP](https://modelcontextprotocol.io) servers: repo tools, Docker test sandbox, docs search, git |
 | Models | Claude (default), Gemini, Groq behind one small interface |
 | Verification | the project's own tests in Docker, plus automatic review checks on the final diff |
@@ -237,6 +237,49 @@ For the first 12 tasks, the loop's runs are from 17–18 Nov and LangGraph's fro
 only code change in between that reaches the model is the per-library wording of one prompt rule.
 The 6 newer tasks were run with both agents on 22–23 Nov.
 
+### Multi-agent: a reviewer agent (preliminary)
+
+The completeness measurement above pointed at one specific weakness: once the tests pass, the
+agent has no signal that old API is still left (every pydantic-cli run left v1 config in its
+examples). So the LangGraph version gained an optional second agent (`--review`):
+
+1. When the migrator's `finish` passes verification, a **reviewer** starts with a *fresh* context
+   (the migrator's summary and diff, none of its reasoning) and **read-only** tools: list, search and
+   read files, docs search, and `find_deprecations`, which runs the suite and reports the deprecated
+   call sites it hits (the completeness parser, as a tool).
+2. It calls `submit_review`: approve, or file:line findings that go back to the migrator, which gets
+   15 fresh steps to fix them and must pass verification again. At most two review rounds.
+3. `find_deprecations` only exists in this mode, so the single-agent baselines keep the exact tools
+   they were benchmarked with, and "success" still means the full suite passes.
+
+**Results so far (Claude Haiku 5.5):**
+
+| Task | Single agent (6 runs, both loops) | Multi-agent | Model calls | Cost per run |
+|---|---|---|---|---|
+| pydantic-cli | 10–29 deprecated call sites left, every run | **0 left** (2 of 2 runs) | 28 → 60–64 | $0.045 → $0.10–0.13 |
+| geojson-pydantic | 0 left | 0 left, plus 2 findings nothing else caught | 15.5 → 36 | $0.018 → $0.035 |
+| FastApi-RESTful | 0 left | 0 left | 12.5 → 32 | $0.009 → $0.023 |
+
+On pydantic-cli the reviewer found exactly what the metric had flagged (v1 `class Config` in
+`examples/`) plus two `.copy()` calls the metric had missed. On geojson-pydantic it found a
+`pydantic~=1.0` pin in `.pre-commit-config.yaml` (outside what the pin check reads) and a README
+example still using v1's `constr(regex=...)`, neither visible to the tests or the completeness metric.
+
+Building it surfaced two problems worth knowing about:
+- **Late reviews need their own budget.** The first trial's review arrived with 7 of the migrator's 40
+  steps left; it fixed two findings and ran out, leaving 11 deprecated sites. Findings now come with
+  15 fresh steps; with that, both runs reached 0.
+- **Don't trust a model's argument types.** One reviewer sent its findings list JSON-encoded as a
+  single string, which the code iterated character by character (529 "findings"). It's now decoded,
+  with a test.
+
+**Why it's preliminary:** the full benchmark (18 tasks × 3 runs, about $3) stopped after 4 runs when
+the API credit ran out (one of those, pyonwater, is excluded: its review call itself failed on the
+credit limit). Free tiers can't stand in: Groq's 8,000 tokens/minute is less than one agent step,
+and Gemini's free quota ran out within the first run. So the evidence is strong on the case that
+motivated the design and directionally consistent on two more, at roughly 2–3× the model calls; the
+benchmark-scale comparison is pending. `benchmark/results/multi-haiku-all18-*.json` resumes it.
+
 ### Does docs search help? (Haiku, 3 runs per setting)
 
 | Project | Success (off → on) | Median steps (off → on) |
@@ -337,7 +380,8 @@ Tests: `uv run pytest` (about 150 tests; the Docker end-to-end test is opt-in wi
 ```
 agent/            loop.py (the agent loop), llm.py (Claude/Gemini/Groq), prompts.py, libraries.py,
                   trace.py (run recording), checks.py (review checks), review.py (human review)
-agent_langgraph/  graph.py (the same agent as a LangGraph StateGraph), run.py (its CLI)
+agent_langgraph/  graph.py (the same agent as a LangGraph StateGraph, plus the optional reviewer agent),
+                  review_prompts.py, run.py (its CLI; --review for multi-agent mode)
 mcp_servers/      repo_tools/, sandbox/, docs_search/, git_tools/
 sandbox/          Dockerfile + entrypoint for running a target repo's tests
 benchmark/        tasks.yaml (verified tasks), runner.py (experiments), results/ (committed results)

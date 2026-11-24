@@ -2,6 +2,7 @@
 
     uv run --env-file .env python -m benchmark.runner --name haiku-docs \\
         --models claude-haiku-5-5 --docs both [--tasks geojson-pydantic,pydantic-cli]
+        [--impl loop|langgraph|multi] [--provider claude|gemini|groq]
 
 Each run is a separate `python -m agent.loop --task ...` process (the same code path as a
 manual run; a crash can't leak into the next run). The model is chosen through the
@@ -99,16 +100,19 @@ def result_row(task: Task, model: str, docs: bool, run_dir: Path) -> dict[str, A
 # Agent implementations an experiment can run: the hand-written loop or the LangGraph graph.
 IMPLS = {"loop": ["agent.loop"], "langgraph": ["agent_langgraph.run"],
          "multi": ["agent_langgraph.run", "--review"]}  # multi: migrator + reviewer agent
+# LLM provider -> the env var that picks its model (agent/llm.py reads them).
+MODEL_ENV = {"claude": "AGENT_CLAUDE_MODEL", "gemini": "GEMINI_MODEL", "groq": "GROQ_MODEL"}
 
 
-def run_one(task: Task, model: str, docs: bool, max_steps: int, impl: str = "loop") -> tuple[Path | None, str | None]:
+def run_one(task: Task, model: str, docs: bool, max_steps: int, impl: str = "loop",
+            provider: str = "claude") -> tuple[Path | None, str | None]:
     """One agent run in a subprocess. Returns (its runs/<id> directory or None if it never
     started, the error text if it never started or didn't finish)."""
     reset_checkout(task)
     cmd = [sys.executable, "-m", *IMPLS[impl], "--task", task.id, "--max-steps", str(max_steps)]
     if not docs:
         cmd.append("--no-docs")
-    env = {**os.environ, "LLM_PROVIDER": "claude", "AGENT_CLAUDE_MODEL": model}
+    env = {**os.environ, "LLM_PROVIDER": provider, MODEL_ENV[provider]: model}
     proc = subprocess.run(cmd, cwd=PROJECT_ROOT, env=env, capture_output=True, text=True, encoding="utf-8")
     match = re.search(r"Recording run to (.+)", proc.stderr)
     error = proc.stderr.strip()[-1500:] if proc.returncode != 0 else None
@@ -136,7 +140,8 @@ def is_complete(row: dict[str, Any]) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a benchmark experiment.")
     parser.add_argument("--name", required=True, help="experiment name, used in the results file name")
-    parser.add_argument("--models", default="claude-opus-5-5", help="comma-separated Claude model ids")
+    parser.add_argument("--provider", choices=list(MODEL_ENV), default="claude", help="LLM provider for every run")
+    parser.add_argument("--models", default="claude-opus-5-5", help="comma-separated model ids for that provider")
     parser.add_argument("--docs", choices=["on", "off", "both"], default="on")
     parser.add_argument("--tasks", default="all", help="comma-separated task ids, or 'all'")
     parser.add_argument("--max-steps", type=int, default=40)
@@ -156,7 +161,8 @@ def main() -> None:
         out = RESULTS_DIR / f"{args.name}-{started:%Y%m%d-%H%M%S}.json"
         config = {"models": args.models.split(","), "docs": args.docs,
                   "tasks": list(all_tasks) if args.tasks == "all" else args.tasks.split(","),
-                  "max_steps": args.max_steps, "repeats": args.repeats, "impl": args.impl}
+                  "max_steps": args.max_steps, "repeats": args.repeats, "impl": args.impl,
+                  "provider": args.provider}
         experiment = {"name": args.name, "started_at": started.isoformat(), "config": config, "rows": []}
     tasks = [all_tasks[t] for t in config["tasks"]]
     docs_settings = {"on": [True], "off": [False], "both": [False, True]}[config["docs"]]
@@ -188,12 +194,13 @@ def main() -> None:
                   f"  uv run --env-file .env python -m benchmark.runner --name x --resume {out}")
             break
         impl = config.get("impl", "loop")  # older results files predate --impl
-        run_dir, error = run_one(task, model, docs, config["max_steps"], impl)
+        provider = config.get("provider", "claude")  # older results files are all Claude
+        run_dir, error = run_one(task, model, docs, config["max_steps"], impl, provider)
         if run_dir is None:
             rows[k] = {"task": task.id, "model": model, "docs_search": docs, "repeat": repeat, "success": False,
                        "failure_category": "infrastructure", "run_id": None, "error": error}
         else:
-            row = {**result_row(task, model, docs, run_dir), "repeat": repeat, "impl": impl}
+            row = {**result_row(task, model, docs, run_dir), "repeat": repeat, "impl": impl, "provider": provider}
             if error:
                 row["error"] = error
             rows[k] = row

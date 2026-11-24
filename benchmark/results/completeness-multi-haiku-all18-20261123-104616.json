@@ -1,0 +1,90 @@
+{
+ "20261123-104627-geojson-pydantic": {
+  "task": "geojson-pydantic",
+  "repeat": 1,
+  "impl": "multi",
+  "status": "passed",
+  "counts": {
+   "total": 134,
+   "passed": 134,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261123-105446-fastapi-restful": {
+  "task": "fastapi-restful",
+  "repeat": 1,
+  "impl": "multi",
+  "status": "passed",
+  "counts": {
+   "total": 69,
+   "passed": 69,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261123-110126-pydantic-cli": {
+  "task": "pydantic-cli",
+  "repeat": 1,
+  "impl": "multi",
+  "status": "passed",
+  "counts": {
+   "total": 35,
+   "passed": 35,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ },
+ "20261123-111309-pyonwater": {
+  "task": "pyonwater",
+  "repeat": 1,
+  "impl": "multi",
+  "status": "passed",
+  "counts": {
+   "total": 25,
+   "passed": 25,
+   "failed": 0,
+   "errors": 0,
+   "skipped": 0
+  },
+  "measurable": true,
+  "library_deprecations": 0,
+  "library_internal": 0,
+  "other_deprecations": 0,
+  "sites": {
+   "library": [],
+   "other": [],
+   "library_internal": []
+  }
+ }
+}
