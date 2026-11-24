@@ -1,4 +1,4 @@
-# Molt
+# Molt: AI Dependency Upgrade Agent
 
 **AI agents that shed deprecated APIs.**
 
