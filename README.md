@@ -265,6 +265,14 @@ On pydantic-cli the reviewer found exactly what the metric had flagged (v1 `clas
 `pydantic~=1.0` pin in `.pre-commit-config.yaml` (outside what the pin check reads) and a README
 example still using v1's `constr(regex=...)`, neither visible to the tests or the completeness metric.
 
+The pydantic-cli run in the dashboard: the reviewer starts after the migrator's verified finish
+(left), and its first review sends 9 file:line findings back (right). Its second `find_deprecations`
+call found 0.
+
+| Reviewer steps after the verified finish | Review 1: findings sent back |
+|---|---|
+| ![reviewer steps](docs/demo/multi-agent-reviewer-steps.png) | ![review card](docs/demo/multi-agent-review-1.png) |
+
 Building it surfaced two problems worth knowing about:
 - **Late reviews need their own budget.** The first trial's review arrived with 7 of the migrator's 40
   steps left; it fixed two findings and ran out, leaving 11 deprecated sites. Findings now come with
