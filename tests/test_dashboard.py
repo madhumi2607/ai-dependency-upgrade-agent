@@ -115,3 +115,13 @@ def test_a_run_that_stopped_writing_is_interrupted_not_running(runs: Path) -> No
     old = time.time() - 2 * 3600  # killed two hours ago: no result.json, no new events
     os.utime(live / "events.jsonl", (old, old))
     assert summarize(live)["status"] == "interrupted"
+
+
+def test_api_and_sandbox_errors_are_interrupted_not_agent_failures(tmp_path: Path) -> None:
+    """A run killed by an exhausted API credit must not lower the agent's success rate."""
+    runs = tmp_path / "runs"
+    for name, stop in (("20261019-120000-a", "llm_error"), ("20261019-130000-b", "max_steps")):
+        write_run(runs, name, [{"type": "start"}, {"type": "test_run", "purpose": "baseline", "report": FAILED_REPORT}],
+                  result={"success": False, "stop_reason": stop, "finished_at": "2026-10-19T12:01:00+00:00"})
+    assert summarize(runs / "20261019-120000-a")["status"] == "interrupted"
+    assert summarize(runs / "20261019-130000-b")["status"] == "failed"  # a real agent failure stays one

@@ -17,6 +17,9 @@ from agent.pricing import estimate_cost
 # the process crashed): it will never finish, so it isn't shown as running. Longer than the slowest
 # single step (a copier test run is ~25 minutes).
 STALE_AFTER_SECONDS = 45 * 60
+# Stop reasons that say nothing about the agent (an exhausted API credit, Docker down): shown as
+# interrupted and left out of the success rate, like benchmark/runner.py's infrastructure category.
+INFRASTRUCTURE_STOPS = ("llm_error", "sandbox_error")
 
 
 def list_run_ids(runs_dir: Path) -> list[str]:
@@ -74,6 +77,8 @@ def summarize(run_dir: Path) -> dict[str, Any]:
         status = "interrupted" if time.time() - last_write > STALE_AFTER_SECONDS else "running"
     else:
         status = "succeeded" if result.get("success") else "failed"
+        if status == "failed" and result.get("stop_reason") in INFRASTRUCTURE_STOPS:
+            status = "interrupted"  # the model API or the sandbox failed, not the agent
     finished_at = result.get("finished_at") if result else None
     duration = None
     if finished_at and meta.get("started_at"):
