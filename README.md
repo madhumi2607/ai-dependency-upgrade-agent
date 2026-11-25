@@ -2,6 +2,8 @@
 
 **AI agents that shed deprecated APIs.**
 
+**Live site:** [anirudhkumar0904.github.io/ai-dependency-upgrade-agent](https://anirudhkumar0904.github.io/ai-dependency-upgrade-agent/), with the narrated demo, the results, and a read-only run viewer for every benchmark run.
+
 Molt's migrator agent upgrades Python codebases across breaking library releases. Given a
 repository written for an old major version (**Pydantic v1** or **SQLAlchemy 1.4**), it upgrades
 the dependency, runs the project's own test suite, reads the migration guide, fixes what broke, and
