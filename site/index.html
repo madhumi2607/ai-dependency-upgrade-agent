@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Molt: AI Dependency Upgrade Agent</title>
+  <meta name="description" content="AI agents that upgrade real Python codebases across breaking library releases (Pydantic v1 to v2, SQLAlchemy 1.4 to 2.0), verified by the project's own tests. 52 of 53 migrations on 18 open-source projects.">
+  <style>
+    :root {
+      --bg: #111110; --surface: #1a1a19; --surface-2: #222220; --border: rgba(255,255,255,.1);
+      --text: #f3f2ec; --text-2: #c3c2b7; --muted: #8e8d84; --accent: #3987e5; --good: #2fb344;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-size: .88em; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+    header.hero { padding: 64px 0 36px; border-bottom: 1px solid var(--border); }
+    .eyebrow { color: var(--muted); font-size: .9rem; letter-spacing: .04em; text-transform: uppercase; }
+    h1 { font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.15; margin: 8px 0 10px; }
+    .tagline { font-size: clamp(1.1rem, 2.4vw, 1.35rem); color: var(--text-2); margin: 0 0 22px; max-width: 760px; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn { display: inline-block; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--border);
+           color: var(--text); background: var(--surface); font-weight: 600; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn:hover { text-decoration: none; filter: brightness(1.12); }
+    section { padding: 44px 0; border-bottom: 1px solid var(--border); }
+    h2 { font-size: 1.5rem; margin: 0 0 16px; }
+    .lead { color: var(--text-2); max-width: 780px; }
+    video { width: 100%; border-radius: 10px; border: 1px solid var(--border); background: #000; display: block; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 8px; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .stat b { display: block; font-size: 1.9rem; line-height: 1.2; }
+    .stat span { color: var(--text-2); font-size: .93rem; }
+    ol.steps { padding-left: 22px; color: var(--text-2); }
+    ol.steps li { margin: 8px 0; }
+    ol.steps b { color: var(--text); }
+    .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+    figure { margin: 0; }
+    figure img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; }
+    figcaption { color: var(--muted); font-size: .88rem; margin-top: 6px; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: .95rem; }
+    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: .85rem; text-transform: uppercase; letter-spacing: .03em; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .good { color: var(--good); font-weight: 700; }
+    .note { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+            border-radius: 8px; padding: 12px 16px; color: var(--text-2); font-size: .95rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .tag { border: 1px solid var(--border); border-radius: 999px; padding: 3px 12px; font-size: .85rem; color: var(--text-2); }
+    footer { padding: 30px 0 50px; color: var(--muted); font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">AI Dependency Upgrade Agent</div>
+      <h1>Molt</h1>
+      <p class="tagline">AI agents that upgrade real Python codebases across breaking library releases,
+        and prove it with the project's own tests.</p>
+      <div class="buttons">
+        <a class="btn primary" href="#demo">Watch the 4-minute demo</a>
+        <a class="btn" href="dashboard/">Explore the benchmark runs</a>
+        <a class="btn" href="https://github.com/anirudhkumar0904/ai-dependency-upgrade-agent">Code on GitHub</a>
+      </div>
+      <div class="tags">
+        <span class="tag">Python</span><span class="tag">Claude API</span><span class="tag">MCP</span>
+        <span class="tag">Docker</span><span class="tag">LangGraph</span><span class="tag">Hybrid RAG (BM25 + ChromaDB)</span>
+        <span class="tag">FastAPI</span><span class="tag">React</span>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <h2>Results</h2>
+      <p class="lead">Measured on 18 real open-source projects (Pydantic v1 → v2 and SQLAlchemy 1.4 → 2.0),
+        3 attempts each, with Claude Haiku. Every task was verified in a sandbox first: its own tests pass on the
+        old version and genuinely fail on the new one.</p>
+      <div class="stats">
+        <div class="stat"><b>52 / 53</b><span>migrations completed by the single agent</span></div>
+        <div class="stat"><b>~$0.025</b><span>per run, thanks to an append-only history and prompt caching</span></div>
+        <div class="stat"><b>92%</b><span>of successful runs leave no deprecated API behind (replayed and measured)</span></div>
+        <div class="stat"><b>0</b><span>tests edited or skipped: the tools refuse to, and every diff is checked</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <h2>Demo</h2>
+      <p class="lead">A real, unedited run watched live in the dashboard (played at 1.4× speed), then a walkthrough
+        of a recorded multi-agent run. Narrated and captioned.</p>
+      <video controls preload="metadata" src="demo.mp4"></video>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li><b>Baseline.</b> The project is installed in a fresh Docker container with the new library version, and its own
+          test suite runs. Failures are grouped by root cause and handed to the model.</li>
+        <li><b>Agent loop.</b> The model can only act through MCP tool servers: read and edit the repo, run the tests in the
+          sandbox (structured summaries, not raw logs), and search the official migration guide with hybrid keyword +
+          embedding retrieval.</li>
+        <li><b>Finish is a request, not a declaration.</b> The loop re-runs the full suite itself and only accepts a pass.</li>
+        <li><b>Reviewer agent (multi-agent mode).</b> A second agent with a fresh context and read-only tools hunts for old
+          API the tests can't see and sends file:line findings back to the migrator.</li>
+        <li><b>Human review.</b> Automatic checks flag weak version pins, compatibility shims and test edits; nothing becomes a
+          branch until a person approves it. The model never gets git access.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Multi-agent: a reviewer that finds what tests miss</h2>
+      <p class="lead">Measuring completeness showed one gap: on pydantic-cli, every single-agent run passed all tests but
+        left Pydantic v1 config in the package's examples. The reviewer agent was built to close exactly that gap.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>pydantic-cli</th><th class="num">Deprecated call sites left</th><th class="num">Tests</th><th class="num">Model calls</th></tr></thead>
+          <tbody>
+            <tr><td>Single agent (6 runs)</td><td class="num">10–29, every run</td><td class="num">35 / 35</td><td class="num">~28</td></tr>
+            <tr><td>Migrator + reviewer (2 runs)</td><td class="num good">0</td><td class="num">35 / 35</td><td class="num">60–64</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid2" style="margin-top:18px">
+        <figure><img src="multi-agent-reviewer-steps.png" alt="Dashboard timeline: the reviewer agent's steps start after the migrator's verified finish" loading="lazy">
+          <figcaption>The reviewer starts after the migrator's verified finish (35/35).</figcaption></figure>
+        <figure><img src="multi-agent-review-1.png" alt="Dashboard: review 1 sends 9 file:line findings back to the migrator" loading="lazy">
+          <figcaption>Review 1 sends nine file:line findings back; the next check finds 0.</figcaption></figure>
+      </div>
+      <p class="note" style="margin-top:18px">Preliminary: the full multi-agent benchmark (18 projects × 3) is pending.
+        Results so far: 0 deprecated sites left on pydantic-cli in both runs, and on another project the reviewer caught a stale
+        version pin and a broken README example that neither the tests nor the metric could see.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Measured, not assumed</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Question</th><th>How it was checked</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>Did it migrate, or just pass tests?</td><td>Replayed all 105 successful runs, counted deprecated API still in use</td><td>91 / 99 measurable runs clean</td></tr>
+            <tr><td>Does it agree with the maintainers?</td><td>Ran upstream's own post-migration tests, never seen by the agent</td><td>No failure due to the migration</td></tr>
+            <tr><td>Is the retrieval any good?</td><td>Evaluated keyword, embedding and hybrid search on real queries</td><td>Hybrid: right section in top 3 for every query</td></tr>
+            <tr><td>Does a framework help?</td><td>Rebuilt the loop in LangGraph, benchmarked both</td><td>Same results, twice the code</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lead" style="margin-top:16px">Every number traces back to a recorded run: open any of them in the
+        <a href="dashboard/">run viewer</a>, or read the <a href="https://github.com/anirudhkumar0904/ai-dependency-upgrade-agent/blob/main/docs/WRITEUP.md">write-up</a>
+        on the design decisions and what went wrong along the way.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      Molt: AI Dependency Upgrade Agent ·
+      <a href="https://github.com/anirudhkumar0904/ai-dependency-upgrade-agent">Source on GitHub</a> ·
+      <a href="dashboard/">Run viewer</a> ·
+      Built by Anirudh Kumar. The site is static: nothing here runs an agent or calls an API.
+    </div>
+  </footer>
+</body>
+</html>

@@ -16,3 +16,6 @@ dashboard/web/dist/
 
 # Downloaded docs and the docs_search index (rebuild with python -m mcp_servers.docs_search.build).
 data/
+
+# Built public site (python site/build_site.py); deployed to the gh-pages branch.
+site/_build/
